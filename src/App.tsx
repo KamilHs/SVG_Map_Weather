@@ -1,10 +1,10 @@
 import React from 'react';
 
-import axios from "./core/axios";
+import { Map } from "./modules/Content";
 
 const App: React.FC = () => {
     return (
-        <h1>Hello World</h1>
+        <Map />
     )
 }
 
