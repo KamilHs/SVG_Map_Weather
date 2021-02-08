@@ -1,10 +1,11 @@
 import React from 'react';
 
-const App: React.FC = () => {
-  return (
-    <h1>Hello World</h1>
-  )
-}
+import axios from "./core/axios";
 
+const App: React.FC = () => {
+    return (
+        <h1>Hello World</h1>
+    )
+}
 
 export default App;
