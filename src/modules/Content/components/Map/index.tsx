@@ -48,7 +48,7 @@ const Map: React.FC = () => {
                 });
                 path.addEventListener("mouseleave", e => boxTimeout = setTimeout(hideBox, 100));
             });
-    }, []);
+    }, [showBox, hideBox]);
     return (
         <div className="map">
             <div ref={boxRef} className="box">
