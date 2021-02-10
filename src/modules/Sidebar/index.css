@@ -1,0 +1,30 @@
+.content {
+    position: fixed;
+    z-index: 2;
+    right: 0;
+    top: 0;
+    overflow: hidden;
+    height: 100%;
+    padding: 0.8rem;
+    background-color: purple;
+    transition: width 0.5s ease, padding 0.5s ease;
+    width: 0;
+}
+
+.content_desktop {
+    width: 50%;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+.content_mobile {
+    width: 100%;
+}
+
+.inner_content {
+    position: relative;
+}
+
+.hidden {
+    width: 0;
+    padding: 0;
+}

@@ -1,4 +1,3 @@
-import { pathToFileURL } from "url";
 import { SET_SELECTED_PATH, SET_IS_ANIMATING, MapActionTypes, IMapState } from "./const";
 
 const initialState: IMapState = {

@@ -3,16 +3,21 @@ import { connect, ConnectedProps } from "react-redux";
 
 import SVGMap from "../../../../components/SVGMap";
 import { RootState } from "../../../../store";
-import "./index.css";
 import { mapActions } from "./redux/actions";
 import { calculate } from "../../../../helpers/svgAnimation";
+import "./index.css";
+import { sidebarActions } from "../../../Sidebar/components/redux/actions";
 
 const mapStateToProps = (state: RootState) => {
-    return { ...state.map };
+    return {
+        ...state.map,
+        isSidebarClosing: state.sidebar.isSidebarClosing
+    };
 }
 const mapDispatch = {
     setIsAnimating: mapActions.setIsAnimating,
-    setSelectedPath: mapActions.setSelectedPath
+    setSelectedPath: mapActions.setSelectedPath,
+    setIsSidebarClosing: sidebarActions.setIsSidebarClosing
 }
 const connector = connect(mapStateToProps, mapDispatch);
 
@@ -32,8 +37,9 @@ const animationConfig = {
 }
 
 let boxTimeout: ReturnType<typeof setTimeout>;
+let isFirstTime = true;
 
-const Map: React.FC<Props> = ({ selectedPath, isAnimating, setIsAnimating, setSelectedPath }) => {
+const Map: React.FC<Props> = ({ selectedPath, isAnimating, isSidebarClosing, setIsAnimating, setSelectedPath, setIsSidebarClosing }) => {
     const mapRef = React.useRef<SVGSVGElement | null>(null);
     const boxRef = React.useRef<HTMLDivElement | null>(null);
     const animationDataRef = React.useRef<IAnimationData>(
@@ -99,39 +105,51 @@ const Map: React.FC<Props> = ({ selectedPath, isAnimating, setIsAnimating, setSe
     }, [selectedPath, setIsAnimating]);
 
     const handleClick = React.useCallback((e: MouseEvent) => {
-        if (e.target instanceof SVGPathElement) {
+        if (e.target instanceof SVGPathElement && selectedPath === null) {
+            isFirstTime = false;
             let path: SVGPathElement = e.target;
             if (mapRef.current === null) return;
             if (isAnimating) return;
-            if (selectedPath && path !== selectedPath) return;
 
-            path.classList.toggle("selected");
-            mapRef.current.querySelectorAll("path").forEach(p => p !== path && p.classList.toggle("disabled"))
-            if (path === selectedPath) {
-                setSelectedPath(null);
-            }
-            else {
-                setSelectedPath(path);
-            }
+            hideBox();
+            setIsSidebarClosing(false);
+            setSelectedPath(path);
         }
-    }, [isAnimating, setSelectedPath, selectedPath]);
+    }, [isAnimating, setSelectedPath, selectedPath, hideBox, setIsSidebarClosing]);
 
     const handleMouseMove = React.useCallback((e: MouseEvent) => {
-        if (e.target instanceof SVGPathElement) {
+        if (e.target instanceof SVGPathElement && !selectedPath && !isAnimating) {
             showBox(e.clientX, e.clientY, e.target)
         }
-    }, [showBox]);
+    }, [showBox, selectedPath, isAnimating]);
 
     const handleMouseEnter = React.useCallback((e: MouseEvent) => {
-        if (e.target instanceof SVGPathElement) {
+        if (e.target instanceof SVGPathElement && !selectedPath && !isAnimating) {
             clearTimeout(boxTimeout);
             showBox(e.clientX, e.clientY, e.target);
         }
-    }, [showBox]);
+    }, [showBox, selectedPath, isAnimating]);
 
     const handleMouseLeave = React.useCallback((e: MouseEvent) => {
         boxTimeout = setTimeout(hideBox, 100)
     }, [hideBox]);
+
+    React.useEffect(() => {
+        if (!mapRef.current) return;
+        mapRef.current.querySelectorAll("path").forEach(path => {
+            if (selectedPath) {
+                if (path === selectedPath) {
+                    path.classList.add("selected");
+                }
+                else {
+                    path.classList.add("disabled");
+                }
+            }
+            else {
+                path.classList.remove("disabled", "selected");
+            }
+        });
+    }, [selectedPath])
 
     React.useEffect(() => {
         if (!mapRef.current) return;
@@ -170,7 +188,10 @@ const Map: React.FC<Props> = ({ selectedPath, isAnimating, setIsAnimating, setSe
     }, [selectedPath, animate]);
 
     return (
-        <div className="map">
+        <div
+            className={["map", (selectedPath && !isAnimating && !isSidebarClosing ? "map_shifted" : "")].join(" ")}
+        >
+            {isFirstTime && <h2 id="tutorial">Click on a region</h2>}
             <div ref={boxRef} className="box">
                 <p className="name"></p>
                 <p className="iso"></p>

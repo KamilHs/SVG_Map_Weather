@@ -2,9 +2,11 @@ import { createStore, applyMiddleware, compose, combineReducers } from "redux";
 import thunk from "redux-thunk";
 
 import { mapReducer } from "../modules/Content/components/Map/redux/reducers";
+import { sidebarReducer } from "../modules/Sidebar/components/redux/reducers";
 
 const rootReducer = combineReducers({
-    map: mapReducer
+    map: mapReducer,
+    sidebar: sidebarReducer
 })
 
 declare global {
