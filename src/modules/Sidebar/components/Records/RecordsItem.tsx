@@ -8,6 +8,14 @@ interface IProps {
     optionsImg: string
 }
 
+const RecordPropertyInfo: React.FC<{ label: string, value: string, unit?: string }> = ({ label, value, unit = "" }) => {
+    return (
+        <div className="record-info__item">
+            <p className="record-info__property">{label}:</p>
+            <p className="record-info__unit">{value}{unit}</p>
+        </div>
+    )
+}
 
 export const Record: React.FC<IProps> = ({ record, weatherImg, optionsImg }) => {
     let recordDate = record.date.split(" ");
@@ -27,7 +35,13 @@ export const Record: React.FC<IProps> = ({ record, weatherImg, optionsImg }) => 
                             <img draggable="false" src={`../${weatherImg}`} alt={record.weather_name} />
                         </div>
                         <div className="record__overlay">
-                            <p className="record__temperature">{record.temperature}</p>
+                            <p
+                                className={`record__temperature ${+record.temperature < 0
+                                    ? "record__temperature_negative"
+                                    : ""}`}
+                            >
+                                {Math.abs(+record.temperature)}
+                            </p>
                             <p className="record__date">{recordDate[0]}</p>
                             <p className="record__time">{recordDate[1].slice(0, -3)}</p>
                         </div>
@@ -44,22 +58,25 @@ export const Record: React.FC<IProps> = ({ record, weatherImg, optionsImg }) => 
                 </div>
                 <div className="record__outer">
                     <div className="record__info">
-                        <div className="record-info__item">
-                            <p className="record-info__property">Wind Speed:</p>
-                            <p className="record-info__unit">{record.wind_speed}km/h</p>
-                        </div>
-                        <div className="record-info__item">
-                            <p className="record-info__property">Pressure:</p>
-                            <p className="record-info__unit">{record.pressure}mb</p>
-                        </div>
-                        <div className="record-info__item">
-                            <p className="record-info__property">Humidity:</p>
-                            <p className="record-info__unit">{record.humidity}%</p>
-                        </div>
-                        <div className="record-info__item">
-                            <p className="record-info__property">Description:</p>
-                            <p className="record-info__unit">{record.temp_name}</p>
-                        </div>
+                        <RecordPropertyInfo
+                            label="Wind Speed"
+                            unit="km/h"
+                            value={record.wind_speed}
+                        />
+                        <RecordPropertyInfo
+                            label="Pressure"
+                            unit="mb"
+                            value={record.pressure}
+                        />
+                        <RecordPropertyInfo
+                            label="Humidity"
+                            unit="%"
+                            value={record.humidity}
+                        />
+                        <RecordPropertyInfo
+                            label="Description"
+                            value={record.temp_name}
+                        />
                     </div>
                 </div>
             </div>

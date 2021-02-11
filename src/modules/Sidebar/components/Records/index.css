@@ -123,6 +123,15 @@
     font-size: 2rem;
 }
 
+.record__temperature_negative:after {
+    content: "-";
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 3rem;
+}
+
 .record__date,
 .record__time {
     background-color: #ffffff70;
