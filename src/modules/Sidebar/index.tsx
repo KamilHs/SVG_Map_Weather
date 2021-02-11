@@ -9,7 +9,6 @@ import { FetchStatus } from "./components/redux/const";
 import "./index.css"
 
 const mapStateToProps = (state: RootState) => {
-    console.log(state);
     return { ...state.map, ...state.sidebar }
 }
 
