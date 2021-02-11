@@ -3,8 +3,9 @@ import { connect, ConnectedProps } from "react-redux";
 
 import { RootState } from "../../store";
 import { mapActions } from "../Content/components/Map/redux/actions";
-import { Header } from "./components";
+import { Header, Preloader } from "./components";
 import { sidebarActions } from "./components/redux/actions";
+import { FetchStatus } from "./components/redux/const";
 import "./index.css"
 
 const mapStateToProps = (state: RootState) => {
@@ -25,7 +26,7 @@ export enum FormType {
     edit = "Edit Data",
 }
 
-const Sidebar: React.FC<Props> = ({ selectedPath, isAnimating, setSelectedPath, setIsSidebarClosing }) => {
+const Sidebar: React.FC<Props> = ({ selectedPath, isAnimating, setSelectedPath, setIsSidebarClosing, fetchStatus }) => {
     const [opened, setOpened] = React.useState<boolean>(false);
     const contentRef = React.useRef<HTMLDivElement>(null);
 
@@ -77,12 +78,12 @@ const Sidebar: React.FC<Props> = ({ selectedPath, isAnimating, setSelectedPath, 
                             ? "mobile"
                             : "desktop"}`].join(" ")}
             >
-
                 <Header
-                    opened={opened}
+                    opened={opened && fetchStatus === FetchStatus.success}
                     title={selectedPath.getAttribute("name")}
                     handleClose={handleClose}
                 />
+                {(fetchStatus === FetchStatus.loading && <Preloader overlay />)}
             </div>
         )
     }

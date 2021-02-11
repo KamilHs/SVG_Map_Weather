@@ -5,8 +5,8 @@ import SVGMap from "../../../../components/SVGMap";
 import { RootState } from "../../../../store";
 import { mapActions } from "./redux/actions";
 import { calculate } from "../../../../helpers/svgAnimation";
-import "./index.css";
 import { sidebarActions } from "../../../Sidebar/components/redux/actions";
+import "./index.css";
 
 const mapStateToProps = (state: RootState) => {
     return {
@@ -17,7 +17,8 @@ const mapStateToProps = (state: RootState) => {
 const mapDispatch = {
     setIsAnimating: mapActions.setIsAnimating,
     setSelectedPath: mapActions.setSelectedPath,
-    setIsSidebarClosing: sidebarActions.setIsSidebarClosing
+    setIsSidebarClosing: sidebarActions.setIsSidebarClosing,
+    fetchDescriptions: sidebarActions.fetchDescriptions,
 }
 const connector = connect(mapStateToProps, mapDispatch);
 
@@ -38,8 +39,9 @@ const animationConfig = {
 
 let boxTimeout: ReturnType<typeof setTimeout>;
 let isFirstTime = true;
+let fetchedDescriptions = false;
 
-const Map: React.FC<Props> = ({ selectedPath, isAnimating, isSidebarClosing, setIsAnimating, setSelectedPath, setIsSidebarClosing }) => {
+const Map: React.FC<Props> = ({ selectedPath, isAnimating, isSidebarClosing, setIsAnimating, setSelectedPath, setIsSidebarClosing, fetchDescriptions }) => {
     const mapRef = React.useRef<SVGSVGElement | null>(null);
     const boxRef = React.useRef<HTMLDivElement | null>(null);
     const animationDataRef = React.useRef<IAnimationData>(
@@ -186,6 +188,13 @@ const Map: React.FC<Props> = ({ selectedPath, isAnimating, isSidebarClosing, set
 
         animate();
     }, [selectedPath, animate]);
+
+    React.useEffect(() => {
+        if (!fetchedDescriptions) {
+            fetchedDescriptions = true;
+            fetchDescriptions();
+        }
+    }, [fetchDescriptions])
 
     return (
         <div
