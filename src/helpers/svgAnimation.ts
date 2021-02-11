@@ -1,5 +1,5 @@
-export const calculate = (svg: SVGElement, selectedPath: SVGPathElement) => {
-    let pathData = selectedPath.getBoundingClientRect();
+export const calculate = (svg: SVGElement, selectedRegion: SVGPathElement) => {
+    let pathData = selectedRegion.getBoundingClientRect();
 
     let pathX = pathData.left + (pathData.right - pathData.left) / 2;
     let pathY = pathData.top + (pathData.bottom - pathData.top) / 2;

@@ -2,9 +2,9 @@ import { ThunkAction } from "redux-thunk";
 
 import api, { IError } from "../../../../core/api";
 import { RootState } from "../../../../store";
-import { FetchStatus, IFetchDescriptionsResult, SET_DESCRIPTIONS, SET_FETCH_STATUS, SET_IS_SIDEBAR_CLOSING, SidebarActionTypes } from "./const";
+import { FetchStatus, IFetchDescriptionsResult, IRecord, SET_DESCRIPTIONS, SET_FETCH_STATUS, SET_IS_SIDEBAR_CLOSING, SET_RECORDS, SidebarActionTypes } from "./const";
 
-const isError = (data: IFetchDescriptionsResult | IError): data is IError => {
+const isError = (data: IFetchDescriptionsResult | IError | IRecord[]): data is IError => {
     return (data as IError).error !== undefined;
 }
 
@@ -21,6 +21,23 @@ export const sidebarActions = {
         type: SET_DESCRIPTIONS,
         payload: descriptions
     }),
+    setRecords: (records: IRecord[] | null): SidebarActionTypes => ({
+        type: SET_RECORDS,
+        payload: records
+    }),
+    fetchRecordsByIso: (iso: string): ThunkAction<void, RootState, unknown, SidebarActionTypes> => async (dispatch) => {
+        dispatch(sidebarActions.setFetchStatus(FetchStatus.loading));
+        try {
+            const { data } = await api.getRecordsByIso(iso);
+
+            if (isError(data)) {
+                throw new Error("Internal Error 500");
+            }
+            dispatch(sidebarActions.setRecords(data));
+        } catch (err) {
+            dispatch(sidebarActions.setFetchStatus(FetchStatus.failure));
+        }
+    },
     fetchDescriptions: (): ThunkAction<void, RootState, unknown, SidebarActionTypes> => async (dispatch) => {
         dispatch(sidebarActions.setFetchStatus(FetchStatus.loading));
         try {

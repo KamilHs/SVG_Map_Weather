@@ -24,6 +24,22 @@
     position: relative;
 }
 
+.pages {
+    width: calc(200% + 1.6rem);
+    display: flex;
+    justify-content: space-between;
+    transform: translateX(0);
+    transition: transform 0.3s ease;
+}
+
+.pages > * {
+    width: calc(50% - 0.8rem);
+}
+
+.inner_content {
+    position: relative;
+}
+
 .hidden {
     width: 0;
     padding: 0;

@@ -1,6 +1,6 @@
 import axios from "./axios";
 import { AxiosResponse } from "axios"
-import { IFetchDescriptionsResult } from "../modules/Sidebar/components/redux/const";
+import { IFetchDescriptionsResult, IRecord } from "../modules/Sidebar/components/redux/const";
 
 export interface IError {
     error: number;
@@ -8,6 +8,7 @@ export interface IError {
 
 const api = {
     getDescriptions: (): Promise<AxiosResponse<IFetchDescriptionsResult | IError>> => axios.get<IFetchDescriptionsResult | IError>("/"),
+    getRecordsByIso: (iso: string): Promise<AxiosResponse<IRecord[] | IError>> => axios.get<IRecord[] | IError>(`?iso=${iso}`),
 }
 
 export default api;

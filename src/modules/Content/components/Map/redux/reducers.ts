@@ -1,7 +1,7 @@
-import { SET_SELECTED_PATH, SET_IS_ANIMATING, MapActionTypes, IMapState } from "./const";
+import { SET_SELECTED_REGION, SET_IS_ANIMATING, MapActionTypes, IMapState } from "./const";
 
 const initialState: IMapState = {
-    selectedPath: null,
+    selectedRegion: null,
     isAnimating: false
 }
 
@@ -13,10 +13,10 @@ export const mapReducer = (state: IMapState = initialState, action: MapActionTyp
                 isAnimating: action.payload
             }
 
-        case SET_SELECTED_PATH:
+        case SET_SELECTED_REGION:
             return {
                 isAnimating: true,
-                selectedPath: action.payload
+                selectedRegion: action.payload
             }
 
         default:

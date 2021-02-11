@@ -1,12 +1,12 @@
-import { SET_SELECTED_PATH, SET_IS_ANIMATING, MapActionTypes } from "./const";
+import { SET_SELECTED_REGION, SET_IS_ANIMATING, MapActionTypes, IRegion } from "./const";
 
 export const mapActions = {
     setIsAnimating: (isAnimating: boolean): MapActionTypes => ({
         type: SET_IS_ANIMATING,
         payload: isAnimating
     }),
-    setSelectedPath: (path: SVGPathElement | null): MapActionTypes => ({
-        type: SET_SELECTED_PATH,
-        payload: path
+    setSelectedRegion: (region: IRegion | null): MapActionTypes => ({
+        type: SET_SELECTED_REGION,
+        payload: region
     })
 }

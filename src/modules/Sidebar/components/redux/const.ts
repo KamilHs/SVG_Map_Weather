@@ -1,12 +1,24 @@
 export const SET_IS_SIDEBAR_CLOSING = "SET_IS_SIDEBAR_CLOSING";
 export const SET_DESCRIPTIONS = "SET_DESCRIPTIONS";
 export const SET_FETCH_STATUS = "SET_FETCH_STATUS";
+export const SET_RECORDS = "SET_RECORDS";
 
 export enum FetchStatus {
     loading,
     success,
     failure,
     none
+}
+
+export interface IRecord {
+    date: string;
+    humidity: string;
+    pressure: string;
+    record_id: string;
+    temp_name: string;
+    temperature: string;
+    weather_name: string;
+    wind_speed: string;
 }
 
 export interface ITemperatureDescription {
@@ -39,9 +51,15 @@ interface ISetFetchStatus {
     payload: FetchStatus
 }
 
-export type SidebarActionTypes = ISetSidebarIsClosing | ISetDescriptions | ISetFetchStatus;
+interface ISetRecords {
+    type: typeof SET_RECORDS;
+    payload: IRecord[] | null
+}
+
+export type SidebarActionTypes = ISetSidebarIsClosing | ISetDescriptions | ISetFetchStatus | ISetRecords;
 
 export interface ISidebarState {
+    records: IRecord[] | null;
     isSidebarClosing: boolean;
     fetchStatus: FetchStatus;
     descriptions: IFetchDescriptionsResult | null;

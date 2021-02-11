@@ -3,18 +3,21 @@ import { connect, ConnectedProps } from "react-redux";
 
 import { RootState } from "../../store";
 import { mapActions } from "../Content/components/Map/redux/actions";
-import { Header, Preloader } from "./components";
+import { Header, Preloader, Records } from "./components";
 import { sidebarActions } from "./components/redux/actions";
 import { FetchStatus } from "./components/redux/const";
 import "./index.css"
 
 const mapStateToProps = (state: RootState) => {
-    return { ...state.map, ...state.sidebar };
+    console.log(state);
+    return { ...state.map, ...state.sidebar }
 }
 
 const mapDispatch = {
-    setSelectedPath: mapActions.setSelectedPath,
-    setIsSidebarClosing: sidebarActions.setIsSidebarClosing
+    setSelectedRegion: mapActions.setSelectedRegion,
+    setIsSidebarClosing: sidebarActions.setIsSidebarClosing,
+    fetchRecordsByIso: sidebarActions.fetchRecordsByIso,
+    setRecords: sidebarActions.setRecords
 }
 const connector = connect(mapStateToProps, mapDispatch);
 
@@ -26,7 +29,7 @@ export enum FormType {
     edit = "Edit Data",
 }
 
-const Sidebar: React.FC<Props> = ({ selectedPath, isAnimating, setSelectedPath, setIsSidebarClosing, fetchStatus }) => {
+const Sidebar: React.FC<Props> = ({ records, selectedRegion, isAnimating, fetchStatus, setRecords, fetchRecordsByIso, setSelectedRegion, setIsSidebarClosing }) => {
     const [opened, setOpened] = React.useState<boolean>(false);
     const contentRef = React.useRef<HTMLDivElement>(null);
 
@@ -40,8 +43,9 @@ const Sidebar: React.FC<Props> = ({ selectedPath, isAnimating, setSelectedPath, 
         if (contentRef.current) {
             contentRef.current.removeEventListener("transitionend", closedTransitionEndHandler)
         }
-        setSelectedPath(null);
-    }, [setSelectedPath]);
+        setSelectedRegion(null);
+        setRecords(null);
+    }, [setSelectedRegion, setRecords]);
 
     const handleClose = React.useCallback(() => {
         if (contentRef.current) {
@@ -56,7 +60,7 @@ const Sidebar: React.FC<Props> = ({ selectedPath, isAnimating, setSelectedPath, 
 
     React.useEffect(() => {
         let div = contentRef.current;
-        if (!div || !selectedPath || isAnimating) return;
+        if (!div || isAnimating) return;
 
         div.addEventListener("transitionend", openedTransitionEndHandler)
 
@@ -66,23 +70,51 @@ const Sidebar: React.FC<Props> = ({ selectedPath, isAnimating, setSelectedPath, 
                 div.removeEventListener("transitionend", closedTransitionEndHandler);
             }
         }
-    }, [selectedPath, isAnimating, openedTransitionEndHandler, closedTransitionEndHandler]);
+    }, [selectedRegion, isAnimating, openedTransitionEndHandler, closedTransitionEndHandler]);
 
-    if (selectedPath && !isAnimating) {
+    const resizeAndLoadHandler = React.useCallback(() => {
+        if (!contentRef.current) return;
+        let elem = document.documentElement;
+        if (elem.clientWidth < elem.clientHeight
+            && !contentRef.current.classList.contains("content_mobile")) {
+            contentRef.current.classList.add("content_mobile");
+            contentRef.current.classList.remove("content_desktop");
+        }
+        else if (elem.clientWidth > elem.clientHeight
+            && !contentRef.current.classList.contains("content_desktop")) {
+            contentRef.current.classList.add("content_desktop");
+            contentRef.current.classList.remove("content_mobile");
+        }
+    }, [])
+
+    React.useEffect(() => {
+        window.addEventListener("resize", resizeAndLoadHandler);
+    })
+
+    React.useEffect(() => {
+        if (selectedRegion && !isAnimating) {
+            resizeAndLoadHandler();
+        }
+    }, [selectedRegion, isAnimating, resizeAndLoadHandler])
+
+    if (selectedRegion && !isAnimating) {
         return (
             <div
                 ref={contentRef}
-                className={
-                    ["content",
-                        `content_${document.documentElement.clientWidth < document.documentElement.clientHeight
-                            ? "mobile"
-                            : "desktop"}`].join(" ")}
+                className="content"
             >
                 <Header
                     opened={opened && fetchStatus === FetchStatus.success}
-                    title={selectedPath.getAttribute("name")}
+                    title={selectedRegion.title}
                     handleClose={handleClose}
                 />
+                {
+                    records && opened && <div className="inner_content">
+                        <div className="pages">
+                            <Records records={records} />
+                        </div>
+                    </div>
+                }
                 {(fetchStatus === FetchStatus.loading && <Preloader overlay />)}
             </div>
         )
