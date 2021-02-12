@@ -3,7 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 
 import { RootState } from "../../store";
 import { mapActions } from "../Content/components/Map/redux/actions";
-import { Header, Preloader, Records } from "./components";
+import { Header, Preloader, Records, Form } from "./components";
 import { sidebarActions } from "./components/redux/actions";
 import { FetchStatus } from "./components/redux/const";
 import "./index.css"
@@ -108,11 +108,14 @@ const Sidebar: React.FC<Props> = ({ records, selectedRegion, isAnimating, fetchS
                     handleClose={handleClose}
                 />
                 {
-                    records && opened && <div className="inner_content">
-                        <div className="pages">
-                            <Records records={records} />
+                    records && opened && <>
+                        <div className="inner_content">
+                            <div className="pages">
+                                <Records records={records} />
+                            </div>
                         </div>
-                    </div>
+                        <Form />
+                    </>
                 }
                 {fetchStatus === FetchStatus.loading && opened && <Preloader overlay />}
                 {fetchStatus === FetchStatus.failure && opened && (
