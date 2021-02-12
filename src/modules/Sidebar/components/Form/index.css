@@ -1,0 +1,124 @@
+.form-section {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    overflow: hidden;
+    width: 100%;
+    padding: 0.8rem;
+    z-index: 10000;
+    top: 0;
+    left: 0;
+    position: absolute;
+    height: 100%;
+    background-color: purple;
+    clip-path: circle(0px at 0 0);
+}
+
+.form-section_hidden {
+    pointer-events: none;
+}
+
+.form-title {
+    display: block;
+    margin: 5px auto 0;
+    color: ghostwhite;
+    font-weight: bolder;
+    font-size: 2rem;
+    background-color: #ffffff70;
+    border-radius: 10px;
+    padding: 1px 20px;
+    min-width: 50%;
+    text-align: center;
+}
+
+.form-title_hidden {
+    opacity: 0;
+}
+
+@media (max-width: 766px) {
+    .form-title {
+        font-size: 1.8rem;
+    }
+}
+
+.form-container {
+    margin-top: 0.8rem;
+}
+
+.record-form {
+    height: 90vh;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+}
+
+form::-webkit-scrollbar {
+    width: 6px;
+    border-radius: 16px;
+}
+
+form::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 16px;
+}
+
+form::-webkit-scrollbar-thumb {
+    background: purple;
+    border-radius: 16px;
+    cursor: pointer;
+}
+
+form::-webkit-scrollbar-thumb:hover {
+    background: rgb(152, 15, 243);
+}
+
+.form__group {
+    padding: 1rem;
+}
+
+.form__group_half {
+    display: inline-block;
+    width: 50%;
+}
+
+.form__label {
+    display: block;
+    color: white;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.form__input {
+    cursor: pointer;
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    color: #41464b;
+}
+
+.form__button {
+    background-color: purple;
+    color: white;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    margin: 2rem 0 4rem;
+    border: none;
+    outline: none !important;
+    transition: 0.2s background-color ease;
+}
+
+.form__button:hover {
+    background-color: rgb(172, 2, 172);
+}
+
+.form__error {
+    font-size: 1rem;
+    color: red;
+}
+
+.form__info {
+    padding-left: 1rem;
+    font-weight: bold;
+    font-size: 1rem;
+    color: rgb(0, 161, 0);
+}
