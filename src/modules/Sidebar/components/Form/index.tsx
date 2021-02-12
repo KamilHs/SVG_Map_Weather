@@ -1,5 +1,7 @@
 import React from "react";
 
+import "index.css";
+
 const Form: React.FC = () => {
     return (
         <div className="form-section form-section_hidden">
