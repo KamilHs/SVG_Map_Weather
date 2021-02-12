@@ -1,7 +1,6 @@
 import React from "react";
 
-
-export const Form: React.FC = () => {
+const Form: React.FC = () => {
     return (
         <div className="form-section form-section_hidden">
             <div className="d-flex justify-content-center w-100">
@@ -77,3 +76,5 @@ export const Form: React.FC = () => {
         </div>
     )
 }
+
+export default Form;
