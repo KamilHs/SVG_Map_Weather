@@ -28,7 +28,7 @@ const Records: React.FC<IProps> = ({ records }) => {
     return (
         <div className="records">
             <div className="container-fluid h-100">
-                <div className="row justify-content-center h-100">
+                <div className="row h-100">
                     {records.map(record => (
                         <Record
                             key={record.record_id}
