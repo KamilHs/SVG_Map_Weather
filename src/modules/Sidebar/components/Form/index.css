@@ -10,7 +10,8 @@
     position: absolute;
     height: 100%;
     background-color: purple;
-    clip-path: circle(0px at 0 0);
+    clip-path: circle(25px at calc(100% - 0.8rem - 25px) calc(0.8rem + 25px));
+    -webkit-clip-path: circle(25px at calc(100% - 0.8rem - 25px) calc(0.8rem + 25px));
 }
 
 .form-section_hidden {
