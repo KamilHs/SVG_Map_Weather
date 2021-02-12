@@ -40,6 +40,13 @@
     position: relative;
 }
 
+.error {
+    color: white;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
 .hidden {
     width: 0;
     padding: 0;

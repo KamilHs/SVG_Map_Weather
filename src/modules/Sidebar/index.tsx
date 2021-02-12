@@ -114,7 +114,12 @@ const Sidebar: React.FC<Props> = ({ records, selectedRegion, isAnimating, fetchS
                         </div>
                     </div>
                 }
-                {(fetchStatus === FetchStatus.loading && <Preloader overlay />)}
+                {fetchStatus === FetchStatus.loading && <Preloader overlay />}
+                {fetchStatus === FetchStatus.failure && opened && (
+                    <div className="d-flex justify-content-center align-items-center w-100 h-100 error text-center" >
+                        <h2 className="text-center w-100">500 Internal Error. Failed to fetch data</h2>
+                    </div >
+                )}
             </div>
         )
     }
