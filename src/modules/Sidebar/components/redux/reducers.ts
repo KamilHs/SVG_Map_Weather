@@ -2,6 +2,8 @@ import { SET_IS_SIDEBAR_CLOSING, SidebarActionTypes, ISidebarState, SET_DESCRIPT
 
 const initialState: ISidebarState = {
     records: null,
+    editedRecord: null,
+    validationErrors: {},
     isSidebarClosing: false,
     fetchStatus: FetchStatus.none,
     descriptions: null

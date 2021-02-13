@@ -2,12 +2,6 @@ import React from "react";
 
 import "./index.css";
 
-export enum FormType {
-    none,
-    create = "Create Data",
-    edit = "Edit Data",
-}
-
 const Form: React.FC = () => {
     return (
         <div className="form-section form-section_hidden">

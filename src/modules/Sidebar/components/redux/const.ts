@@ -2,6 +2,11 @@ export const SET_IS_SIDEBAR_CLOSING = "SET_IS_SIDEBAR_CLOSING";
 export const SET_DESCRIPTIONS = "SET_DESCRIPTIONS";
 export const SET_FETCH_STATUS = "SET_FETCH_STATUS";
 export const SET_RECORDS = "SET_RECORDS";
+export const CREATE_RECORD = "CREATE_RECORD";
+export const SET_EDITED_RECORD = "SET_EDITED_RECORD";
+export const SET_FORM_STATE = "SET_FORM_STATE";
+export const DELETE_RECORD = "DELETE_RECORD";
+export const EDIT_RECORD = "EDIT_RECORD";
 
 export enum FetchStatus {
     loading,
@@ -9,6 +14,13 @@ export enum FetchStatus {
     failure,
     none
 }
+
+export enum FormState {
+    none,
+    create = "Create Data",
+    edit = "Edit Data",
+}
+
 
 export interface IRecord {
     date: string;
@@ -56,11 +68,38 @@ interface ISetRecords {
     payload: IRecord[] | null
 }
 
-export type SidebarActionTypes = ISetSidebarIsClosing | ISetDescriptions | ISetFetchStatus | ISetRecords;
+interface ISetEditedRecord {
+    type: typeof SET_EDITED_RECORD;
+    payload: IRecord;
+}
+
+interface ISetFormState {
+    type: typeof SET_FORM_STATE;
+    payload: FormState
+}
+
+export interface ICreateRecord {
+    type: typeof CREATE_RECORD;
+    payload: FormData;
+}
+
+export interface IDeleteRecord {
+    type: typeof DELETE_RECORD;
+    payload: IRecord["record_id"]
+}
+
+export interface IEditRecord {
+    type: typeof EDIT_RECORD;
+    payload: FormData;
+}
+
+export type SidebarActionTypes = ISetSidebarIsClosing | ISetDescriptions | ISetFetchStatus | ISetRecords | ISetEditedRecord | ISetFormState;
 
 export interface ISidebarState {
     records: IRecord[] | null;
+    editedRecord: IRecord[] | null;
     isSidebarClosing: boolean;
+    validationErrors: object;
     fetchStatus: FetchStatus;
     descriptions: IFetchDescriptionsResult | null;
 }
