@@ -1,11 +1,10 @@
 import React from "react";
 
-import { FormType } from "../../";
 import "./index.css";
 
 interface IProps {
     handleClose: () => void;
-    title: string | FormType | null;
+    title: string | null;
     opened: boolean;
 }
 

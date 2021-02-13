@@ -23,10 +23,6 @@ const connector = connect(mapStateToProps, mapDispatch);
 type PropsRedux = ConnectedProps<typeof connector>
 type Props = PropsRedux;
 
-export enum FormType {
-    create = "Create Data",
-    edit = "Edit Data",
-}
 
 const Sidebar: React.FC<Props> = ({ records, selectedRegion, isAnimating, fetchStatus, setRecords, fetchRecordsByIso, setSelectedRegion, setIsSidebarClosing }) => {
     const [opened, setOpened] = React.useState<boolean>(false);
