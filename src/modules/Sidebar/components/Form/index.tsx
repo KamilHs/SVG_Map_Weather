@@ -74,8 +74,6 @@ const Form: React.FC = () => {
                             <select name="weather_desc" id="weather_desc" className="form__input"></select>
                         </div>
                     </div>
-                    <input autoComplete="off" type="hidden" name="city" id="city" />
-                    <input autoComplete="off" type="hidden" name="record" id="record" />
                     <div className="d-flex justify-content-center">
                         <button className="form__button" type="button">Add data</button>
                     </div>
