@@ -24,6 +24,30 @@ const connector = connect(mapStateToProps, mapDispatch);
 type PropsRedux = ConnectedProps<typeof connector>
 type Props = PropsRedux;
 
+const PropertyFormGroup: React.FC<{
+    label: string,
+    name: string,
+    unit?: string,
+    type?: string,
+    halfWidth?: boolean
+}> = ({ label, name, unit, halfWidth = false, type = "text" }) => {
+    return (
+        <div className={`form__group ${halfWidth && "w-100 w-md-50"}`}>
+            <div className="d-flex justify-content-between align-items-center">
+                <label htmlFor={name} className="form__label">{label} {unit}</label>
+                <span className="form__error" id={`${name}-error`}></span>
+            </div>
+            <input
+                autoComplete="off"
+                name={name}
+                id={name}
+                type={type}
+                step={type === "number" ? "0.01" : ""}
+                className="form__input" />
+        </div>
+    )
+}
+
 const Form: React.FC<Props> = ({ formState, temperatureDescriptions, weatherDescriptions, setFormState }) => {
     const formRef = React.useRef<HTMLDivElement>(null);
 
@@ -67,44 +91,37 @@ const Form: React.FC<Props> = ({ formState, temperatureDescriptions, weatherDesc
                     <span className="form__info"></span>
                     <span className="form__error" id="record-error"></span>
                     <span className="form__error" id="city-error"></span>
-                    <div className="form__group">
-                        <div className="d-flex justify-content-between align-items-center">
-                            <label htmlFor="date" className="form__label">Date</label>
-                            <span className="form__error" id="date-error"></span>
-                        </div>
-                        <input autoComplete="off" name="date" id="date" type="datetime-local" className="form__input" />
+                    <PropertyFormGroup
+                        name="date"
+                        label="Date"
+                        type="datetime-local" />
+                    <div className="d-flex flex-column flex-md-row">
+                        <PropertyFormGroup
+                            name="temperature"
+                            label="Temperature"
+                            unit="°C"
+                            type="number"
+                            halfWidth />
+                        <PropertyFormGroup
+                            name="pressure"
+                            label="Pressure"
+                            unit="mb"
+                            type="number"
+                            halfWidth />
                     </div>
                     <div className="d-flex flex-column flex-md-row">
-                        <div className="form__group w-100 w-md-50">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <label htmlFor="temperature" className="form__label">Temperature °C</label>
-                                <span className="form__error" id="temperature-error"></span>
-                            </div>
-                            <input autoComplete="off" name="temperature" id="temperature" type="text" className="form__input" />
-                        </div>
-                        <div className="form__group w-100 w-md-50">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <label htmlFor="pressure" className="form__label">Pressure mb</label>
-                                <span className="form__error" id="pressure-error"></span>
-                            </div>
-                            <input autoComplete="off" name="pressure" id="pressure" type="text" className="form__input" />
-                        </div>
-                    </div>
-                    <div className="d-flex flex-column flex-md-row">
-                        <div className="form__group w-100 w-md-50">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <label htmlFor="wind" className="form__label">Wind Speed km/h</label>
-                                <span className="form__error" id="wind-error"></span>
-                            </div>
-                            <input autoComplete="off" name="wind" id="wind" type="text" className="form__input" />
-                        </div>
-                        <div className="form__group w-100 w-md-50">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <label htmlFor="humidity" className="form__label">Humidity %</label>
-                                <span className="form__error" id="humidity-error"></span>
-                            </div>
-                            <input autoComplete="off" name="humidity" id="humidity" type="text" className="form__input" />
-                        </div>
+                        <PropertyFormGroup
+                            name="wind"
+                            label="Wind Speed"
+                            unit="km/h"
+                            type="number"
+                            halfWidth />
+                        <PropertyFormGroup
+                            name="humidity"
+                            label="Humidity"
+                            unit="%"
+                            type="number"
+                            halfWidth />
                     </div>
                     <div className="d-flex flex-column flex-md-row">
                         <div className="form__group w-100 w-md-50">
