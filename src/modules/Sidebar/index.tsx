@@ -54,7 +54,7 @@ const Sidebar: React.FC<Props> = ({ records, selectedRegion, isAnimating, fetchS
     }, [closedTransitionEndHandler, setIsSidebarClosing]);
 
     React.useEffect(() => {
-        let div = contentRef.current;
+        const div = contentRef.current;
         if (!div || isAnimating) return;
 
         div.addEventListener("transitionend", openedTransitionEndHandler)
@@ -84,7 +84,8 @@ const Sidebar: React.FC<Props> = ({ records, selectedRegion, isAnimating, fetchS
 
     React.useEffect(() => {
         window.addEventListener("resize", resizeAndLoadHandler);
-    })
+    });
+
 
     React.useEffect(() => {
         if (selectedRegion && !isAnimating) {
@@ -100,7 +101,6 @@ const Sidebar: React.FC<Props> = ({ records, selectedRegion, isAnimating, fetchS
             >
                 <Header
                     opened={opened && records !== null}
-                    title={selectedRegion.title}
                     handleClose={handleClose}
                 />
                 {

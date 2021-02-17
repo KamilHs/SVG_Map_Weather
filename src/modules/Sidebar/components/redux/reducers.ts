@@ -1,4 +1,4 @@
-import { SET_IS_SIDEBAR_CLOSING, SidebarActionTypes, ISidebarState, SET_DESCRIPTIONS, FetchStatus, SET_FETCH_STATUS, SET_RECORDS } from "./const";
+import { SET_IS_SIDEBAR_CLOSING, SidebarActionTypes, ISidebarState, SET_DESCRIPTIONS, FetchStatus, SET_FETCH_STATUS, SET_RECORDS, FormState, SET_FORM_STATE } from "./const";
 
 const initialState: ISidebarState = {
     records: null,
@@ -6,7 +6,8 @@ const initialState: ISidebarState = {
     validationErrors: {},
     isSidebarClosing: false,
     fetchStatus: FetchStatus.none,
-    descriptions: null
+    descriptions: null,
+    formState: FormState.none,
 }
 
 export const sidebarReducer = (state: ISidebarState = initialState, action: SidebarActionTypes): ISidebarState => {
@@ -32,6 +33,11 @@ export const sidebarReducer = (state: ISidebarState = initialState, action: Side
                 ...state,
                 fetchStatus: FetchStatus.success,
                 records: action.payload
+            }
+        case SET_FORM_STATE:
+            return {
+                ...state,
+                formState: action.payload
             }
         default:
             return state;

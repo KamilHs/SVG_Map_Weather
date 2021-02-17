@@ -17,8 +17,10 @@ export enum FetchStatus {
 
 export enum FormState {
     none,
-    create = "Create Data",
-    edit = "Edit Data",
+    closingCreate,
+    closingEdit,
+    create,
+    edit,
 }
 
 
@@ -70,7 +72,7 @@ interface ISetRecords {
 
 interface ISetEditedRecord {
     type: typeof SET_EDITED_RECORD;
-    payload: IRecord;
+    payload: IRecord | null;
 }
 
 interface ISetFormState {
@@ -102,4 +104,5 @@ export interface ISidebarState {
     validationErrors: object;
     fetchStatus: FetchStatus;
     descriptions: IFetchDescriptionsResult | null;
+    formState: FormState;
 }

@@ -10,12 +10,23 @@
     position: absolute;
     height: 100%;
     background-color: purple;
+    transition: clip-path 1s ease;
     clip-path: circle(25px at calc(100% - 0.8rem - 25px) calc(0.8rem + 25px));
     -webkit-clip-path: circle(25px at calc(100% - 0.8rem - 25px) calc(0.8rem + 25px));
 }
 
 .form-section_hidden {
     pointer-events: none;
+}
+
+.form-section_closing {
+    background-color: rgb(79, 61, 125);
+}
+
+.form-section_opened {
+    background-color: rgb(79, 61, 125);
+    clip-path: circle(200% at calc(100% - 0.8rem - 25px) calc(0.8rem + 25px));
+    -webkit-clip-path: circle(200% at calc(100% - 0.8rem - 25px) calc(0.8rem + 25px));
 }
 
 .form-title {

@@ -1,12 +1,64 @@
 import React from "react";
+import { connect, ConnectedProps } from "react-redux";
+
+import { RootState } from "../../../../store";
+import { sidebarActions } from "../../components/redux/actions";
+import { FormState } from "../redux/const";
 
 import "./index.css";
 
-const Form: React.FC = () => {
+const mapStateToProps = (state: RootState) => {
+    return {
+        formState: state.sidebar.formState
+    }
+}
+
+const mapDispatch = {
+    setFormState: sidebarActions.setFormState
+}
+
+const connector = connect(mapStateToProps, mapDispatch);
+
+type PropsRedux = ConnectedProps<typeof connector>
+type Props = PropsRedux;
+
+const Form: React.FC<Props> = ({ formState, setFormState }) => {
+    const formRef = React.useRef<HTMLDivElement>(null);
+
+    const transitionEndHandler = React.useCallback(() => {
+        if (!formRef.current) return;
+        if (formState === FormState.none ||
+            formState === FormState.create ||
+            formState === FormState.edit) return;
+        setFormState(FormState.none);
+    }, [formState, setFormState]);
+
+    React.useEffect(() => {
+        let div = formRef.current;
+        if (div) {
+            div.addEventListener("transitionend", transitionEndHandler);
+        }
+        return () => {
+            if (div) {
+                div.removeEventListener("transitionend", transitionEndHandler);
+            }
+        }
+    }, [transitionEndHandler])
     return (
-        <div className="form-section form-section_hidden">
+        <div ref={formRef} className={`form-section ${formState === FormState.create || formState === FormState.edit
+            ? "form-section_opened"
+            : (formState === FormState.closingCreate || formState === FormState.closingEdit
+                ? "form-section_closing"
+                : "form-section_hidden")}
+                `}>
             <div className="d-flex justify-content-center w-100">
-                <h2 className="form-title">Add Data</h2>
+                <h2 className="form-title">{
+                    formState === FormState.create || formState === FormState.closingCreate
+                        ? "Create "
+                        : (formState === FormState.edit || formState === FormState.closingEdit
+                            ? "Edit"
+                            : "")
+                }Data</h2>
             </div>
             <div className="form-container">
                 <form className="record-form" action="#">
@@ -69,7 +121,13 @@ const Form: React.FC = () => {
                         </div>
                     </div>
                     <div className="d-flex justify-content-center">
-                        <button className="form__button" type="button">Add data</button>
+                        <button className="form__button" type="button">{
+                            formState === FormState.create || formState === FormState.closingCreate
+                                ? "Create "
+                                : (formState === FormState.edit || formState === FormState.closingEdit
+                                    ? "Edit"
+                                    : "")
+                        }Data</button>
                     </div>
                 </form>
             </div>
@@ -77,4 +135,4 @@ const Form: React.FC = () => {
     )
 }
 
-export default Form;
+export default connector(Form);
