@@ -99,7 +99,7 @@ const Sidebar: React.FC<Props> = ({ records, selectedRegion, isAnimating, fetchS
                 className="content"
             >
                 <Header
-                    opened={opened && fetchStatus === FetchStatus.success}
+                    opened={opened && records !== null}
                     title={selectedRegion.title}
                     handleClose={handleClose}
                 />
