@@ -9,7 +9,9 @@ import "./index.css";
 
 const mapStateToProps = (state: RootState) => {
     return {
-        formState: state.sidebar.formState
+        formState: state.sidebar.formState,
+        weatherDescriptions: state.sidebar.descriptions?.weather_descs || [],
+        temperatureDescriptions: state.sidebar.descriptions?.temp_descs || []
     }
 }
 
@@ -22,7 +24,7 @@ const connector = connect(mapStateToProps, mapDispatch);
 type PropsRedux = ConnectedProps<typeof connector>
 type Props = PropsRedux;
 
-const Form: React.FC<Props> = ({ formState, setFormState }) => {
+const Form: React.FC<Props> = ({ formState, temperatureDescriptions, weatherDescriptions, setFormState }) => {
     const formRef = React.useRef<HTMLDivElement>(null);
 
     const transitionEndHandler = React.useCallback(() => {
@@ -110,14 +112,28 @@ const Form: React.FC<Props> = ({ formState, setFormState }) => {
                                 <label htmlFor="temp_desc" className="form__label">Temperature Description</label>
                                 <span className="form__error" id="temp_desc-error"></span>
                             </div>
-                            <select name="temp_desc" id="temp_desc" className="form__input"></select>
+                            <select name="temp_desc" id="temp_desc" className="form__input">
+                                {temperatureDescriptions.map(tempDesc => (
+                                    <option
+                                        key={tempDesc.temp_desc_id}
+                                        value={tempDesc.temp_desc_id}
+                                    >{tempDesc.name}</option>
+                                ))}
+                            </select>
                         </div>
                         <div className="form__group w-100 w-md-50">
                             <div className="d-flex justify-content-between align-items-center">
                                 <label htmlFor="weather_desc" className="form__label">Weather Description</label>
                                 <span className="form__error" id="weather_desc-error"></span>
                             </div>
-                            <select name="weather_desc" id="weather_desc" className="form__input"></select>
+                            <select name="weather_desc" id="weather_desc" className="form__input">
+                                {weatherDescriptions.map(weatherDesc => (
+                                    <option
+                                        key={weatherDesc.weather_desc_id}
+                                        value={weatherDesc.weather_desc_id}
+                                    >{weatherDesc.name}</option>
+                                ))}
+                            </select>
                         </div>
                     </div>
                     <div className="d-flex justify-content-center">
