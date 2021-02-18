@@ -34,10 +34,14 @@ const Records: React.FC<IProps> = ({ records }) => {
     }, []);
     const triggerClickHandler = React.useCallback((ref: React.RefObject<HTMLDivElement>, e: React.MouseEvent<HTMLElement>) => {
         if (!ref.current) return;
-        
+
         e.stopPropagation();
         if (selectedRecordRef.current)
             selectedRecordRef.current.classList.remove("record__controllers_visible");
+        if (selectedRecordRef.current === ref.current) {
+            selectedRecordRef.current = null;
+            return;
+        }
         ref.current.classList.add("record__controllers_visible");
 
         selectedRecordRef.current = ref.current;
