@@ -30,8 +30,8 @@ export interface IValidationError {
     pressure?: string;
     wind?: string;
     humidity?: string;
-    temp_desc?: string;
-    weather_desc?: string;
+    temp_desc_id?: string;
+    weather_desc_id?: string;
     date?: string;
     city?: string;
     record?: string;
@@ -42,9 +42,11 @@ export interface IRecord {
     humidity: string;
     pressure: string;
     record_id: string;
-    temp_name: string;
+    temp_desc_name: string;
+    temp_desc_id: string;
     temperature: string;
-    weather_name: string;
+    weather_desc_name: string;
+    weather_desc_id: string;
     wind_speed: string;
 }
 
@@ -108,8 +110,8 @@ export interface ICreateFormData {
     pressure: string;
     wind: string;
     humidity: string;
-    temp_desc: string;
-    weather_desc: string;
+    temp_desc_id: string;
+    weather_desc_id: string;
     date: string;
     city: string;
 }
@@ -129,7 +131,7 @@ export type SidebarActionTypes = ISetSidebarIsClosing | ISetDescriptions | ISetF
 
 export interface ISidebarState {
     records: IRecord[] | null;
-    editedRecord: IRecord[] | null;
+    editedRecord: IRecord | null;
     isSidebarClosing: boolean;
     validationErrors: IValidationError;
     fetchStatus: FetchStatus;

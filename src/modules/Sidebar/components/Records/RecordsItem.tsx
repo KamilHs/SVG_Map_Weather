@@ -8,6 +8,7 @@ interface IProps {
     optionsImg: string;
     documentClickHandler: (ref: React.RefObject<HTMLDivElement>) => void;
     triggerClickHandler: (ref: React.RefObject<HTMLDivElement>, e: React.MouseEvent<HTMLElement>) => void;
+    editOptionClickHandler: (record: IRecord) => void;
 }
 
 const RecordPropertyInfo: React.FC<{ label: string, value: string, unit?: string }> = ({ label, value, unit = "" }) => {
@@ -19,7 +20,13 @@ const RecordPropertyInfo: React.FC<{ label: string, value: string, unit?: string
     )
 }
 
-export const Record: React.FC<IProps> = ({ record, weatherImg, optionsImg, documentClickHandler, triggerClickHandler }) => {
+export const Record: React.FC<IProps> = ({
+    record,
+    weatherImg,
+    optionsImg,
+    documentClickHandler,
+    triggerClickHandler,
+    editOptionClickHandler }) => {
     const controllersRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
@@ -47,7 +54,7 @@ export const Record: React.FC<IProps> = ({ record, weatherImg, optionsImg, docum
                     </div>
                     <div className="record__inner-content" >
                         <div className="record__image">
-                            <img draggable="false" src={`../${weatherImg}`} alt={record.weather_name} />
+                            <img draggable="false" src={`../${weatherImg}`} alt={record.weather_desc_name} />
                         </div>
                         <div className="record__overlay">
                             <p
@@ -65,7 +72,7 @@ export const Record: React.FC<IProps> = ({ record, weatherImg, optionsImg, docum
                                 <img draggable="false" src={optionsImg} alt="options" />
                             </div>
                             <div onClick={triggerClickHandler.bind(null, controllersRef)} ref={controllersRef} className="record__controllers">
-                                <button className='record__controller record__controller_edit'>Edit</button>
+                                <button onClick={editOptionClickHandler.bind(null, record)} className='record__controller record__controller_edit'>Edit</button>
                                 <button className='record__controller record__controller_delete'>Delete</button>
                             </div>
                         </div>
@@ -90,7 +97,7 @@ export const Record: React.FC<IProps> = ({ record, weatherImg, optionsImg, docum
                         />
                         <RecordPropertyInfo
                             label="Description"
-                            value={record.temp_name}
+                            value={record.temp_desc_name}
                         />
                     </div>
                 </div>

@@ -1,5 +1,7 @@
 import React from "react";
+import { connect, ConnectedProps } from "react-redux";
 
+import { RootState } from "../../../../store";
 import { IRecord } from "../redux/const";
 import { Record } from "./RecordsItem";
 
@@ -10,6 +12,7 @@ import snowy from "../../../../imgs/weather/snowy.png";
 import sunny from "../../../../imgs/weather/sunny.png";
 import options from "../../../../imgs/options.svg";
 import "./index.css";
+import { sidebarActions } from "../redux/actions";
 
 const imgs = {
     cloudly,
@@ -19,12 +22,20 @@ const imgs = {
     sunny,
 }
 
-
-interface IProps {
-    records: IRecord[],
+const mapStateToProps = (state: RootState) => {
+    return { records: state.sidebar.records }
 }
 
-const Records: React.FC<IProps> = ({ records }) => {
+const mapDispatch = {
+    setEditRecord: sidebarActions.setEditRecord
+};
+
+const connector = connect(mapStateToProps, mapDispatch);
+
+type PropsRedux = ConnectedProps<typeof connector>
+type Props = PropsRedux;
+
+const Records: React.FC<Props> = ({ records, setEditRecord }) => {
     const selectedRecordRef = React.useRef<HTMLElement | null>(null);
     const documentClickHandler = React.useCallback((ref: React.RefObject<HTMLDivElement>) => {
         if (!ref.current) return;
@@ -47,18 +58,23 @@ const Records: React.FC<IProps> = ({ records }) => {
         selectedRecordRef.current = ref.current;
     }, []);
 
+    const editOptionClickHandler = React.useCallback((record: IRecord) => {
+        setEditRecord(record);
+    }, [setEditRecord])
+
     return (
         <div className="records">
             <div className="container-fluid h-100">
                 <div className="row h-100">
-                    {records.map(record => (
+                    {records && records.map(record => (
                         <Record
                             key={record.record_id}
                             record={record}
-                            weatherImg={imgs[record.weather_name as never]}
+                            weatherImg={imgs[record.weather_desc_name as never]}
                             optionsImg={options}
                             documentClickHandler={documentClickHandler}
                             triggerClickHandler={triggerClickHandler}
+                            editOptionClickHandler={editOptionClickHandler}
                         />
                     ))}
                 </div>
@@ -67,4 +83,4 @@ const Records: React.FC<IProps> = ({ records }) => {
     );
 }
 
-export default Records;
+export default connector(Records);

@@ -29,7 +29,7 @@ interface IProps {
 type Props = PropsRedux & IProps;
 
 const Header: React.FC<Props> = ({ title, formState, opened, setFormState, handleClose }) => {
-    const handleClick = React.useCallback(() => {
+    const handleClick = React.useCallback(() => {        
         switch (formState) {
             case FormState.create:
                 setFormState(FormState.closingCreate);

@@ -50,6 +50,7 @@ export const sidebarActions = {
     createRecord: (formData: ICreateFormData): ThunkAction<void, RootState, unknown, SidebarActionTypes> => async dispatch => {
         try {
             const { data } = await api.postCreateRecord(formData);
+            console.log(data);
 
             if (isFormError(data)) {
                 return dispatch(sidebarActions.setValidationErrors(data));

@@ -107,7 +107,7 @@ const Sidebar: React.FC<Props> = ({ records, selectedRegion, isAnimating, fetchS
                     records && opened && <>
                         <div className="inner_content">
                             <div className="pages">
-                                <Records records={records} />
+                                <Records />
                             </div>
                         </div>
                         <Form />

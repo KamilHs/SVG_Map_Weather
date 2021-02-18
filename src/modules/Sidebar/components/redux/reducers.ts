@@ -1,4 +1,4 @@
-import { SET_IS_SIDEBAR_CLOSING, SidebarActionTypes, ISidebarState, SET_DESCRIPTIONS, FetchStatus, SET_FETCH_STATUS, SET_RECORDS, FormState, SET_FORM_STATE, SET_VALIDATION_ERRORS, SET_FORM_SUBMISSION_STATUS } from "./const";
+import { SET_IS_SIDEBAR_CLOSING, SidebarActionTypes, ISidebarState, SET_DESCRIPTIONS, FetchStatus, SET_FETCH_STATUS, SET_RECORDS, FormState, SET_FORM_STATE, SET_VALIDATION_ERRORS, SET_FORM_SUBMISSION_STATUS, SET_EDITED_RECORD } from "./const";
 
 const initialState: ISidebarState = {
     records: null,
@@ -40,6 +40,7 @@ export const sidebarReducer = (state: ISidebarState = initialState, action: Side
                 return {
                     ...state,
                     validationErrors: {},
+                    editedRecord: null,
                     formSubmissionStatus: null,
                     formState: action.payload
                 }
@@ -57,6 +58,12 @@ export const sidebarReducer = (state: ISidebarState = initialState, action: Side
             return {
                 ...state,
                 formSubmissionStatus: action.payload
+            }
+        case SET_EDITED_RECORD:
+            return {
+                ...state,
+                formState: action.payload !== null ? FormState.edit : FormState.closingEdit,
+                editedRecord: action.payload
             }
         default:
             return state;

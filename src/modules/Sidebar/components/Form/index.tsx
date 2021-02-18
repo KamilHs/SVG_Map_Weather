@@ -1,5 +1,6 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
+import { formatDate } from "../../../../helpers/formatDate";
 
 import { RootState } from "../../../../store";
 import { sidebarActions } from "../../components/redux/actions";
@@ -10,6 +11,7 @@ import "./index.css";
 const mapStateToProps = (state: RootState) => {
     return {
         validationErrors: state.sidebar.validationErrors,
+        editedRecord: state.sidebar.editedRecord,
         formSubmissionStatus: state.sidebar.formSubmissionStatus,
         selectedRegionIso: state.map.selectedRegion?.iso,
         formState: state.sidebar.formState,
@@ -65,8 +67,10 @@ interface IFields {
     pressure: string;
     wind: string;
     humidity: string;
-    temp_desc: string;
-    weather_desc: string;
+    temp_desc_id: string;
+    weather_desc_id: string;
+    temp_desc_name: string;
+    weather_desc_name: string;
 }
 
 const Form: React.FC<Props> = ({
@@ -76,19 +80,25 @@ const Form: React.FC<Props> = ({
     temperatureDescriptions,
     weatherDescriptions,
     formSubmissionStatus,
+    editedRecord,
     setFormState,
     createRecord,
     fetchRecordsByIso }) => {
     const formRef = React.useRef<HTMLDivElement>(null);
-    const initialValues: IFields = React.useMemo(() => ({
-        date: "",
-        temperature: "",
-        pressure: "",
-        wind: "",
-        humidity: "",
-        temp_desc: temperatureDescriptions[0].temp_desc_id,
-        weather_desc: weatherDescriptions[0].weather_desc_id
-    }), [temperatureDescriptions, weatherDescriptions]);
+    const initialValues: IFields = React.useMemo(() => {
+        return {
+            date: editedRecord?.date || "",
+            temperature: editedRecord?.temperature || "",
+            pressure: editedRecord?.pressure || "",
+            wind: editedRecord?.wind_speed || "",
+            humidity: editedRecord?.humidity || "",
+            temp_desc_id: editedRecord?.temp_desc_id || temperatureDescriptions[0].temp_desc_id,
+            weather_desc_id: editedRecord?.weather_desc_id || weatherDescriptions[0].weather_desc_id,
+            temp_desc_name: editedRecord?.temp_desc_name || temperatureDescriptions[0].name,
+            weather_desc_name: editedRecord?.weather_desc_name || weatherDescriptions[0].name,
+        }
+    }, [temperatureDescriptions, weatherDescriptions, editedRecord]);
+
     const [values, setValues] = React.useState<IFields>({ ...initialValues });
 
     const transitionEndHandler = React.useCallback(() => {
@@ -96,8 +106,8 @@ const Form: React.FC<Props> = ({
         if (formState === FormState.none ||
             formState === FormState.create ||
             formState === FormState.edit) return;
-        setValues({ ...initialValues });
         setFormState(FormState.none);
+        setValues({ ...initialValues });
     }, [formState, initialValues, setFormState]);
 
     const submitHandler = React.useCallback((e: React.FormEvent) => {
@@ -110,9 +120,7 @@ const Form: React.FC<Props> = ({
     }, [values, selectedRegionIso, createRecord]);
 
     React.useEffect(() => {
-        if (formSubmissionStatus) {
-            setValues({ ...initialValues })
-        }
+        setValues({ ...initialValues })
     }, [formSubmissionStatus, initialValues, setValues])
 
     React.useEffect(() => {
@@ -145,7 +153,7 @@ const Form: React.FC<Props> = ({
                     formState === FormState.create || formState === FormState.closingCreate
                         ? "Create "
                         : (formState === FormState.edit || formState === FormState.closingEdit
-                            ? "Edit"
+                            ? "Edit "
                             : "")
                 }Data</h2>
             </div>
@@ -162,7 +170,7 @@ const Form: React.FC<Props> = ({
                         label="Date"
                         type="datetime-local"
                         error={validationErrors.date}
-                        value={values.date}
+                        value={(values.date && formatDate(values.date)) || ""}
                         onChange={e => setValues({ ...values, date: e.target.value })} />
                     <div className="d-flex flex-column flex-md-row">
                         <PropertyFormGroup
@@ -207,14 +215,14 @@ const Form: React.FC<Props> = ({
                     <div className="d-flex flex-column flex-md-row">
                         <div className="form__group w-100 w-md-50">
                             <div className="d-flex justify-content-between align-items-center">
-                                <label htmlFor="temp_desc" className="form__label">Temperature Description</label>
-                                <span className="form__error" id="temp_desc-error">{validationErrors.temp_desc}</span>
+                                <label htmlFor="temp_desc_id" className="form__label">Temperature Description</label>
+                                <span className="form__error" id="temp_desc-error">{validationErrors.temp_desc_id}</span>
                             </div>
                             <select
-                                defaultValue={values.temp_desc}
-                                onChange={e => setValues({ ...values, temp_desc: e.target.value })}
-                                name="temp_desc"
-                                id="temp_desc"
+                                defaultValue={values.temp_desc_id}
+                                onChange={e => setValues({ ...values, temp_desc_id: e.target.value })}
+                                name="temp_desc_id"
+                                id="temp_desc_id"
                                 className="form__input">
                                 {temperatureDescriptions.map(tempDesc => (
                                     <option
@@ -226,14 +234,14 @@ const Form: React.FC<Props> = ({
                         </div>
                         <div className="form__group w-100 w-md-50">
                             <div className="d-flex justify-content-between align-items-center">
-                                <label htmlFor="weather_desc" className="form__label">Weather Description</label>
-                                <span className="form__error" id="weather_desc-error">{validationErrors.weather_desc}</span>
+                                <label htmlFor="weather_desc_id" className="form__label">Weather Description</label>
+                                <span className="form__error" id="weather_desc-error">{validationErrors.weather_desc_id}</span>
                             </div>
                             <select
-                                defaultValue={values.weather_desc}
-                                onChange={e => setValues({ ...values, weather_desc: e.target.value })}
-                                name="weather_desc"
-                                id="weather_desc"
+                                defaultValue={values.weather_desc_id}
+                                onChange={e => setValues({ ...values, weather_desc_id: e.target.value })}
+                                name="weather_desc_id"
+                                id="weather_desc_id"
                                 className="form__input">
                                 {weatherDescriptions.map(weatherDesc => (
                                     <option
@@ -249,7 +257,7 @@ const Form: React.FC<Props> = ({
                             formState === FormState.create || formState === FormState.closingCreate
                                 ? "Create "
                                 : (formState === FormState.edit || formState === FormState.closingEdit
-                                    ? "Edit"
+                                    ? "Edit "
                                     : "")
                         }Data</button>
                     </div>
