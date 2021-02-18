@@ -52,7 +52,7 @@ const Header: React.FC<Props> = ({ title, formState, opened, setFormState, handl
         }
     }, [formState, setFormState])
     return (
-        <div className="d-flex justify-content-center align-items-center w-100 position-relative">
+        <div className="d-flex justify-content-between align-items-start w-100 position-relative">
             <div onClick={handleClose} className="close-container">
                 <div className="leftright"></div>
                 <div className="rightleft"></div>
