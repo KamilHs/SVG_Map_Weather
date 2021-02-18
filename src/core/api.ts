@@ -1,6 +1,6 @@
 import axios from "./axios";
 import { AxiosResponse } from "axios"
-import { ICreateFormData, IFetchDescriptionsResult, IFormError, IRecord } from "../modules/Sidebar/components/redux/const";
+import { ICreateFormData, IFetchDescriptionsResult, IValidationError, IRecord } from "../modules/Sidebar/components/redux/const";
 
 export interface IError {
     error: number;
@@ -17,8 +17,8 @@ const api = {
     getRecordsByIso: (iso: string): Promise<AxiosResponse<IRecord[] | IError>> => (
         axios.get<IRecord[] | IError>(`?iso=${iso}`)
     ),
-    postCreateRecord: (data: ICreateFormData): Promise<AxiosResponse<ISuccess | IFormError>> => (
-        axios.post<ISuccess | IFormError>("/", data, {
+    postCreateRecord: (data: ICreateFormData): Promise<AxiosResponse<ISuccess | IValidationError>> => (
+        axios.post<ISuccess | IValidationError>("/", data, {
             headers: {
                 "Content-Type": "application/json"
             }

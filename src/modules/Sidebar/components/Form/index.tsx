@@ -20,6 +20,7 @@ const mapStateToProps = (state: RootState) => {
 const mapDispatch = {
     setFormState: sidebarActions.setFormState,
     createRecord: sidebarActions.createRecord,
+    setValidationErrors: sidebarActions.setValidationErrors
 }
 
 const connector = connect(mapStateToProps, mapDispatch);

@@ -7,7 +7,7 @@ export const SET_EDITED_RECORD = "SET_EDITED_RECORD";
 export const SET_FORM_STATE = "SET_FORM_STATE";
 export const DELETE_RECORD = "DELETE_RECORD";
 export const EDIT_RECORD = "EDIT_RECORD";
-export const SET_FORM_ERRORS = "SET_FORM_ERRORS";
+export const SET_VALIDATION_ERRORS = "SET_VALIDATION_ERRORS";
 
 export enum FetchStatus {
     loading,
@@ -24,7 +24,7 @@ export enum FormState {
     edit,
 }
 
-export interface IFormError {
+export interface IValidationError {
     temperature?: string;
     pressure?: string;
     wind?: string;
@@ -93,8 +93,8 @@ interface ISetFormState {
 }
 
 interface ISetFormErrors {
-    type: typeof SET_FORM_ERRORS;
-    payload: IFormError;
+    type: typeof SET_VALIDATION_ERRORS;
+    payload: IValidationError;
 }
 
 export interface ICreateFormData {
@@ -125,7 +125,7 @@ export interface ISidebarState {
     records: IRecord[] | null;
     editedRecord: IRecord[] | null;
     isSidebarClosing: boolean;
-    validationErrors: IFormError;
+    validationErrors: IValidationError;
     fetchStatus: FetchStatus;
     descriptions: IFetchDescriptionsResult | null;
     formState: FormState;
