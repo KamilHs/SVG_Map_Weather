@@ -80,7 +80,7 @@ const Form: React.FC<Props> = ({
     createRecord,
     fetchRecordsByIso }) => {
     const formRef = React.useRef<HTMLDivElement>(null);
-    const [values, setValues] = React.useState<IFields>({
+    const initialValues: IFields = React.useMemo(() => ({
         date: "",
         temperature: "",
         pressure: "",
@@ -88,24 +88,17 @@ const Form: React.FC<Props> = ({
         humidity: "",
         temp_desc: temperatureDescriptions[0].temp_desc_id,
         weather_desc: weatherDescriptions[0].weather_desc_id
-    });
+    }), [temperatureDescriptions, weatherDescriptions]);
+    const [values, setValues] = React.useState<IFields>({ ...initialValues });
 
     const transitionEndHandler = React.useCallback(() => {
         if (!formRef.current) return;
         if (formState === FormState.none ||
             formState === FormState.create ||
             formState === FormState.edit) return;
-        setValues({
-            date: "",
-            temperature: "",
-            pressure: "",
-            wind: "",
-            humidity: "",
-            temp_desc: temperatureDescriptions[0].temp_desc_id,
-            weather_desc: weatherDescriptions[0].weather_desc_id
-        });
+        setValues({ ...initialValues });
         setFormState(FormState.none);
-    }, [formState, temperatureDescriptions, weatherDescriptions, setFormState]);
+    }, [formState, initialValues, setFormState]);
 
     const submitHandler = React.useCallback((e: React.FormEvent) => {
         if (!selectedRegionIso) return;
@@ -115,6 +108,12 @@ const Form: React.FC<Props> = ({
             city: selectedRegionIso
         })
     }, [values, selectedRegionIso, createRecord]);
+
+    React.useEffect(() => {
+        if (formSubmissionStatus) {
+            setValues({ ...initialValues })
+        }
+    }, [formSubmissionStatus, initialValues, setValues])
 
     React.useEffect(() => {
         let div = formRef.current;

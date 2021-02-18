@@ -57,6 +57,7 @@ export const sidebarActions = {
             if (isError(data)) {
                 return dispatch(sidebarActions.setFormSubmissionStatus(false))
             }
+            dispatch(sidebarActions.setValidationErrors({}));
             dispatch(sidebarActions.setFormSubmissionStatus(data.success));
         } catch (err) {
             dispatch(sidebarActions.setFormSubmissionStatus(false));
