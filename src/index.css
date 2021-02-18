@@ -10,6 +10,7 @@
 }
 
 input {
+  user-select: text;
   -webkit-user-select: text;
   border: none;
 }
