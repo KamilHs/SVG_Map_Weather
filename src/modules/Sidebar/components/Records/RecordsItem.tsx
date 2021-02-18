@@ -5,7 +5,9 @@ import { IRecord } from "../redux/const";
 interface IProps {
     record: IRecord;
     weatherImg: string;
-    optionsImg: string
+    optionsImg: string;
+    documentClickHandler: (ref: React.RefObject<HTMLDivElement>) => void;
+    triggerClickHandler: (ref: React.RefObject<HTMLDivElement>, e: React.MouseEvent<HTMLElement>) => void;
 }
 
 const RecordPropertyInfo: React.FC<{ label: string, value: string, unit?: string }> = ({ label, value, unit = "" }) => {
@@ -17,8 +19,21 @@ const RecordPropertyInfo: React.FC<{ label: string, value: string, unit?: string
     )
 }
 
-export const Record: React.FC<IProps> = ({ record, weatherImg, optionsImg }) => {
+export const Record: React.FC<IProps> = ({ record, weatherImg, optionsImg, documentClickHandler, triggerClickHandler }) => {
+    const controllersRef = React.useRef<HTMLDivElement>(null);
+
+    React.useEffect(() => {
+        if (!controllersRef.current) return;
+        const bindedHandler = documentClickHandler.bind(null, controllersRef);
+        document.addEventListener("click", bindedHandler);
+
+        return () => {
+            document.removeEventListener("click", bindedHandler);
+        }
+    }, [documentClickHandler]);
+
     let recordDate = record.date.split(" ");
+
     return (
         <div className="col-12 col-sm-6 col-md-6 col-lg-4 mb-5" >
             <div className="record">
@@ -46,10 +61,10 @@ export const Record: React.FC<IProps> = ({ record, weatherImg, optionsImg }) => 
                             <p className="record__time">{recordDate[1].slice(0, -3)}</p>
                         </div>
                         <div className="record__options">
-                            <div className="record__options-trigger">
+                            <div onClick={triggerClickHandler.bind(null, controllersRef)} className="record__options-trigger">
                                 <img draggable="false" src={optionsImg} alt="options" />
                             </div>
-                            <div className="record__controllers">
+                            <div onClick={triggerClickHandler.bind(null, controllersRef)} ref={controllersRef} className="record__controllers">
                                 <button className='record__controller record__controller_edit'>Edit</button>
                                 <button className='record__controller record__controller_delete'>Delete</button>
                             </div>

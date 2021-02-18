@@ -25,6 +25,24 @@ interface IProps {
 }
 
 const Records: React.FC<IProps> = ({ records }) => {
+    const selectedRecordRef = React.useRef<HTMLElement | null>(null);
+    const documentClickHandler = React.useCallback((ref: React.RefObject<HTMLDivElement>) => {
+        if (!ref.current) return;
+
+        selectedRecordRef.current = null;
+        ref.current.classList.remove("record__controllers_visible");
+    }, []);
+    const triggerClickHandler = React.useCallback((ref: React.RefObject<HTMLDivElement>, e: React.MouseEvent<HTMLElement>) => {
+        if (!ref.current) return;
+        
+        e.stopPropagation();
+        if (selectedRecordRef.current)
+            selectedRecordRef.current.classList.remove("record__controllers_visible");
+        ref.current.classList.add("record__controllers_visible");
+
+        selectedRecordRef.current = ref.current;
+    }, []);
+
     return (
         <div className="records">
             <div className="container-fluid h-100">
@@ -35,6 +53,8 @@ const Records: React.FC<IProps> = ({ records }) => {
                             record={record}
                             weatherImg={imgs[record.weather_name as never]}
                             optionsImg={options}
+                            documentClickHandler={documentClickHandler}
+                            triggerClickHandler={triggerClickHandler}
                         />
                     ))}
                 </div>
