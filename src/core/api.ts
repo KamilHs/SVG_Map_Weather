@@ -17,8 +17,8 @@ const api = {
     getRecordsByIso: (iso: string): Promise<AxiosResponse<IRecord[] | IError>> => (
         axios.get<IRecord[] | IError>(`?iso=${iso}`)
     ),
-    postCreateRecord: (data: ICreateFormData): Promise<AxiosResponse<ISuccess | IValidationError>> => (
-        axios.post<ISuccess | IValidationError>("/", data, {
+    postCreateRecord: (data: ICreateFormData): Promise<AxiosResponse<ISuccess | IValidationError | IError>> => (
+        axios.post<ISuccess | IValidationError | IError>("/", data, {
             headers: {
                 "Content-Type": "application/json"
             }
