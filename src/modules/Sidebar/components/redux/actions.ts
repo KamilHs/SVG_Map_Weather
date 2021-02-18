@@ -1,11 +1,15 @@
 import { ThunkAction } from "redux-thunk";
 
-import api, { IError } from "../../../../core/api";
+import api, { IError, ISuccess } from "../../../../core/api";
 import { RootState } from "../../../../store";
-import { FetchStatus, FormState, IFetchDescriptionsResult, IRecord, SET_DESCRIPTIONS, SET_EDITED_RECORD, SET_FETCH_STATUS, SET_FORM_STATE, SET_IS_SIDEBAR_CLOSING, SET_RECORDS, SidebarActionTypes } from "./const";
+import { FetchStatus, FormState, ICreateFormData, IFetchDescriptionsResult, IFormError, IRecord, SET_DESCRIPTIONS, SET_EDITED_RECORD, SET_FETCH_STATUS, SET_FORM_ERRORS, SET_FORM_STATE, SET_IS_SIDEBAR_CLOSING, SET_RECORDS, SidebarActionTypes } from "./const";
 
 const isError = (data: IFetchDescriptionsResult | IError | IRecord[]): data is IError => {
     return (data as IError).error !== undefined;
+}
+
+const isFormError = (data: IFormError | ISuccess): data is IFormError => {
+    return (data as ISuccess).success === undefined
 }
 
 export const sidebarActions = {
@@ -33,10 +37,17 @@ export const sidebarActions = {
         type: SET_FORM_STATE,
         payload: formState
     }),
-    createRecord: (formData: FormData): ThunkAction<void, RootState, unknown, SidebarActionTypes> => async dispatch => {
+    setFormErrors: (errors: IFormError): SidebarActionTypes => ({
+        type: SET_FORM_ERRORS,
+        payload: errors
+    }),
+    createRecord: (formData: ICreateFormData): ThunkAction<void, RootState, unknown, SidebarActionTypes> => async dispatch => {
         try {
             const { data } = await api.postCreateRecord(formData);
-            return data;
+
+            if (isFormError(data)) {
+                dispatch(sidebarActions.setFormErrors(data));
+            }
         } catch (err) {
             dispatch(sidebarActions.setFetchStatus(FetchStatus.failure));
         }
