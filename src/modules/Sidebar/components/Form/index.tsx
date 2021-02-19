@@ -23,6 +23,7 @@ const mapStateToProps = (state: RootState) => {
 const mapDispatch = {
     setFormState: sidebarActions.setFormState,
     createRecord: sidebarActions.createRecord,
+    editRecord: sidebarActions.editRecord,
     setValidationErrors: sidebarActions.setValidationErrors,
     fetchRecordsByIso: sidebarActions.fetchRecordsByIso,
 }
@@ -83,6 +84,7 @@ const Form: React.FC<Props> = ({
     editedRecord,
     setFormState,
     createRecord,
+    editRecord,
     fetchRecordsByIso }) => {
     const formRef = React.useRef<HTMLDivElement>(null);
     const initialValues: IFields = React.useMemo(() => {
@@ -113,15 +115,25 @@ const Form: React.FC<Props> = ({
     const submitHandler = React.useCallback((e: React.FormEvent) => {
         if (!selectedRegionIso) return;
         e.preventDefault();
-        createRecord({
-            ...values,
-            city: selectedRegionIso
-        })
-    }, [values, selectedRegionIso, createRecord]);
+        if (formState === FormState.edit && editedRecord) {
+            editRecord({
+                ...values,
+                record_id: editedRecord.record_id,
+                city: selectedRegionIso
+            })
+        }
+        else {
+            createRecord({
+                ...values,
+                city: selectedRegionIso
+            })
+        }
+    }, [values, selectedRegionIso, formState, editedRecord, createRecord, editRecord]);
 
     React.useEffect(() => {
+        if (editedRecord && formSubmissionStatus) return;
         setValues({ ...initialValues })
-    }, [formSubmissionStatus, initialValues, setValues])
+    }, [editedRecord, formSubmissionStatus, initialValues, setValues])
 
     React.useEffect(() => {
         let div = formRef.current;

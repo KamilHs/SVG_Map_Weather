@@ -2,11 +2,9 @@ export const SET_IS_SIDEBAR_CLOSING = "SET_IS_SIDEBAR_CLOSING";
 export const SET_DESCRIPTIONS = "SET_DESCRIPTIONS";
 export const SET_FETCH_STATUS = "SET_FETCH_STATUS";
 export const SET_RECORDS = "SET_RECORDS";
-export const CREATE_RECORD = "CREATE_RECORD";
 export const SET_EDITED_RECORD = "SET_EDITED_RECORD";
 export const SET_FORM_STATE = "SET_FORM_STATE";
 export const DELETE_RECORD = "DELETE_RECORD";
-export const EDIT_RECORD = "EDIT_RECORD";
 export const SET_VALIDATION_ERRORS = "SET_VALIDATION_ERRORS";
 export const SET_FORM_SUBMISSION_STATUS = "SET_FORM_SUBMISSION_STATUS";
 
@@ -116,14 +114,13 @@ export interface ICreateFormData {
     city: string;
 }
 
+export interface IEditFormData extends ICreateFormData {
+    record_id: string;
+}
+
 export interface IDeleteRecord {
     type: typeof DELETE_RECORD;
     payload: IRecord["record_id"]
-}
-
-export interface IEditRecord {
-    type: typeof EDIT_RECORD;
-    payload: FormData;
 }
 
 export type SidebarActionTypes = ISetSidebarIsClosing | ISetDescriptions | ISetFetchStatus |

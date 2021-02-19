@@ -2,7 +2,7 @@ import { ThunkAction } from "redux-thunk";
 
 import api, { IError, ISuccess } from "../../../../core/api";
 import { RootState } from "../../../../store";
-import { FetchStatus, FormState, ICreateFormData, IFetchDescriptionsResult, IValidationError, IRecord, SET_DESCRIPTIONS, SET_EDITED_RECORD, SET_FETCH_STATUS, SET_VALIDATION_ERRORS, SET_FORM_STATE, SET_IS_SIDEBAR_CLOSING, SET_RECORDS, SidebarActionTypes, SET_FORM_SUBMISSION_STATUS } from "./const";
+import { FetchStatus, FormState, ICreateFormData, IFetchDescriptionsResult, IValidationError, IRecord, SET_DESCRIPTIONS, SET_EDITED_RECORD, SET_FETCH_STATUS, SET_VALIDATION_ERRORS, SET_FORM_STATE, SET_IS_SIDEBAR_CLOSING, SET_RECORDS, SidebarActionTypes, SET_FORM_SUBMISSION_STATUS, IEditFormData } from "./const";
 
 const isError = (data: IFetchDescriptionsResult | IError | IRecord[] | IValidationError | ISuccess): data is IError => {
     return (data as IError).error !== undefined;
@@ -50,7 +50,22 @@ export const sidebarActions = {
     createRecord: (formData: ICreateFormData): ThunkAction<void, RootState, unknown, SidebarActionTypes> => async dispatch => {
         try {
             const { data } = await api.postCreateRecord(formData);
-            console.log(data);
+
+            if (isFormError(data)) {
+                return dispatch(sidebarActions.setValidationErrors(data));
+            }
+            if (isError(data)) {
+                return dispatch(sidebarActions.setFormSubmissionStatus(false))
+            }
+            dispatch(sidebarActions.setValidationErrors({}));
+            dispatch(sidebarActions.setFormSubmissionStatus(data.success));
+        } catch (err) {
+            dispatch(sidebarActions.setFormSubmissionStatus(false));
+        }
+    },
+    editRecord: (formData: IEditFormData): ThunkAction<void, RootState, unknown, SidebarActionTypes> => async dispatch => {
+        try {
+            const { data } = await api.postEditRecord(formData);
 
             if (isFormError(data)) {
                 return dispatch(sidebarActions.setValidationErrors(data));
