@@ -2,7 +2,7 @@ import { ThunkAction } from "redux-thunk";
 
 import api, { IError, ISuccess } from "../../../../core/api";
 import { RootState } from "../../../../store";
-import { FetchStatus, FormState, ICreateFormData, IFetchDescriptionsResult, IValidationError, IRecord, SET_DESCRIPTIONS, SET_EDITED_RECORD, SET_FETCH_STATUS, SET_VALIDATION_ERRORS, SET_FORM_STATE, SET_IS_SIDEBAR_CLOSING, SET_RECORDS, SidebarActionTypes, SET_FORM_SUBMISSION_STATUS, IEditFormData } from "./const";
+import { FetchStatus, FormState, ICreateFormData, IFetchDescriptionsResult, IValidationError, IRecord, SET_DESCRIPTIONS, SET_EDITED_RECORD, SET_FETCH_STATUS, SET_VALIDATION_ERRORS, SET_FORM_STATE, SET_IS_SIDEBAR_CLOSING, SET_RECORDS, SidebarActionTypes, SET_FORM_SUBMISSION_STATUS, IEditFormData, DeleteRecordStatus, SET_DELETE_RECORD_STATUS, SET_RECORD_ID_TO_BE_DELETED, FormSubmissionStatus } from "./const";
 
 const isError = (data: IFetchDescriptionsResult | IError | IRecord[] | IValidationError | ISuccess): data is IError => {
     return (data as IError).error !== undefined;
@@ -43,9 +43,17 @@ export const sidebarActions = {
         type: SET_VALIDATION_ERRORS,
         payload: errors
     }),
-    setFormSubmissionStatus: (status: boolean | null): SidebarActionTypes => ({
+    setFormSubmissionStatus: (status: FormSubmissionStatus): SidebarActionTypes => ({
         type: SET_FORM_SUBMISSION_STATUS,
         payload: status
+    }),
+    setDeleteRecordStatus: (status: DeleteRecordStatus): SidebarActionTypes => ({
+        type: SET_DELETE_RECORD_STATUS,
+        payload: status
+    }),
+    setRecordIdToBeDeleted: (record_id: IRecord["record_id"] | null): SidebarActionTypes => ({
+        type: SET_RECORD_ID_TO_BE_DELETED,
+        payload: record_id
     }),
     createRecord: (formData: ICreateFormData): ThunkAction<void, RootState, unknown, SidebarActionTypes> => async dispatch => {
         try {
@@ -55,12 +63,14 @@ export const sidebarActions = {
                 return dispatch(sidebarActions.setValidationErrors(data));
             }
             if (isError(data)) {
-                return dispatch(sidebarActions.setFormSubmissionStatus(false))
+                return dispatch(sidebarActions.setFormSubmissionStatus(FormSubmissionStatus.failure))
             }
             dispatch(sidebarActions.setValidationErrors({}));
-            dispatch(sidebarActions.setFormSubmissionStatus(data.success));
+            dispatch(sidebarActions.setFormSubmissionStatus(data.success
+                ? FormSubmissionStatus.success
+                : FormSubmissionStatus.failure));
         } catch (err) {
-            dispatch(sidebarActions.setFormSubmissionStatus(false));
+            dispatch(sidebarActions.setFormSubmissionStatus(FormSubmissionStatus.failure));
         }
     },
     editRecord: (formData: IEditFormData): ThunkAction<void, RootState, unknown, SidebarActionTypes> => async dispatch => {
@@ -71,16 +81,34 @@ export const sidebarActions = {
                 return dispatch(sidebarActions.setValidationErrors(data));
             }
             if (isError(data)) {
-                return dispatch(sidebarActions.setFormSubmissionStatus(false))
+                return dispatch(sidebarActions.setFormSubmissionStatus(FormSubmissionStatus.failure))
             }
             dispatch(sidebarActions.setValidationErrors({}));
-            dispatch(sidebarActions.setFormSubmissionStatus(data.success));
+            dispatch(sidebarActions.setFormSubmissionStatus(data.success
+                ? FormSubmissionStatus.success
+                : FormSubmissionStatus.failure));
         } catch (err) {
-            dispatch(sidebarActions.setFormSubmissionStatus(false));
+            dispatch(sidebarActions.setFormSubmissionStatus(FormSubmissionStatus.failure));
+        }
+    },
+    deleteRecord: (record_id: IRecord["record_id"]): ThunkAction<void, RootState, unknown, SidebarActionTypes> => async dispatch => {
+        try {
+            dispatch(sidebarActions.setRecordIdToBeDeleted(record_id));
+            const { data } = await api.deleteDeleteRecord(record_id);
+
+            if (isError(data)) {
+                return dispatch(sidebarActions.setDeleteRecordStatus(DeleteRecordStatus.failure));
+            }
+            dispatch(sidebarActions.setRecordIdToBeDeleted(null));
+        }
+        catch (err) {
+            dispatch(sidebarActions.setDeleteRecordStatus(DeleteRecordStatus.failure));
         }
     },
     fetchRecordsByIso: (iso: string): ThunkAction<void, RootState, unknown, SidebarActionTypes> => async dispatch => {
         dispatch(sidebarActions.setFetchStatus(FetchStatus.loading));
+        dispatch(sidebarActions.setDeleteRecordStatus(DeleteRecordStatus.none));
+
         try {
             const { data } = await api.getRecordsByIso(iso);
 

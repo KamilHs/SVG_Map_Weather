@@ -4,7 +4,7 @@ import { formatDate } from "../../../../helpers/formatDate";
 
 import { RootState } from "../../../../store";
 import { sidebarActions } from "../../components/redux/actions";
-import { FormState } from "../redux/const";
+import { FormState, FormSubmissionStatus } from "../redux/const";
 
 import "./index.css";
 
@@ -131,7 +131,7 @@ const Form: React.FC<Props> = ({
     }, [values, selectedRegionIso, formState, editedRecord, createRecord, editRecord]);
 
     React.useEffect(() => {
-        if (editedRecord && formSubmissionStatus) return;
+        if (editedRecord && formSubmissionStatus === FormSubmissionStatus.success) return;
         setValues({ ...initialValues })
     }, [editedRecord, formSubmissionStatus, initialValues, setValues])
 
@@ -148,7 +148,7 @@ const Form: React.FC<Props> = ({
     }, [transitionEndHandler]);
 
     React.useEffect(() => {
-        if (formSubmissionStatus && selectedRegionIso) {
+        if (selectedRegionIso && formSubmissionStatus === FormSubmissionStatus.success) {
             fetchRecordsByIso(selectedRegionIso);
         }
     }, [fetchRecordsByIso, formSubmissionStatus, selectedRegionIso])
@@ -172,10 +172,10 @@ const Form: React.FC<Props> = ({
             <div className="form-container">
                 <form onSubmit={submitHandler} className="record-form" action="#">
                     <span className="form__info">{
-                        formSubmissionStatus && ((formState === FormState.create || formState === FormState.closingCreate)
+                        formSubmissionStatus === FormSubmissionStatus.success && ((formState === FormState.create || formState === FormState.closingCreate)
                             ? "Created successfully"
                             : (formState === FormState.edit || formState === FormState.closingEdit) && "Edited successfully")}</span>
-                    <span className="form__error" id="record-error">{formSubmissionStatus === false && "Something went wrong"}</span>
+                    <span className="form__error" id="record-error">{formSubmissionStatus === FormSubmissionStatus.failure && "Something went wrong"}</span>
                     <span className="form__error" id="city-error">{validationErrors.city}</span>
                     <PropertyFormGroup
                         name="date"

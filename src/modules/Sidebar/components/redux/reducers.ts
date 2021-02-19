@@ -1,13 +1,15 @@
-import { SET_IS_SIDEBAR_CLOSING, SidebarActionTypes, ISidebarState, SET_DESCRIPTIONS, FetchStatus, SET_FETCH_STATUS, SET_RECORDS, FormState, SET_FORM_STATE, SET_VALIDATION_ERRORS, SET_FORM_SUBMISSION_STATUS, SET_EDITED_RECORD } from "./const";
+import { SET_DELETE_RECORD_STATUS, SET_IS_SIDEBAR_CLOSING, SidebarActionTypes, ISidebarState, SET_DESCRIPTIONS, FetchStatus, SET_FETCH_STATUS, SET_RECORDS, FormState, SET_FORM_STATE, SET_VALIDATION_ERRORS, SET_FORM_SUBMISSION_STATUS, SET_EDITED_RECORD, DeleteRecordStatus, SET_RECORD_ID_TO_BE_DELETED, FormSubmissionStatus } from "./const";
 
 const initialState: ISidebarState = {
     records: null,
     editedRecord: null,
-    formSubmissionStatus: null,
     validationErrors: {},
     isSidebarClosing: false,
-    fetchStatus: FetchStatus.none,
     descriptions: null,
+    recordIdToBeDeleted: null,
+    formSubmissionStatus: FormSubmissionStatus.none,
+    deleteRecordStatus: DeleteRecordStatus.none,
+    fetchStatus: FetchStatus.none,
     formState: FormState.none,
 }
 
@@ -41,7 +43,7 @@ export const sidebarReducer = (state: ISidebarState = initialState, action: Side
                     ...state,
                     validationErrors: {},
                     editedRecord: null,
-                    formSubmissionStatus: null,
+                    formSubmissionStatus: FormSubmissionStatus.none,
                     formState: action.payload
                 }
             }
@@ -64,6 +66,24 @@ export const sidebarReducer = (state: ISidebarState = initialState, action: Side
                 ...state,
                 formState: action.payload !== null ? FormState.edit : FormState.closingEdit,
                 editedRecord: action.payload
+            }
+        case SET_DELETE_RECORD_STATUS:
+            return {
+                ...state,
+                deleteRecordStatus: action.payload
+            }
+        case SET_RECORD_ID_TO_BE_DELETED:
+            if (action.payload) {
+                return {
+                    ...state,
+                    deleteRecordStatus: DeleteRecordStatus.loading,
+                    recordIdToBeDeleted: action.payload
+                }
+            }
+            return {
+                ...state,
+                deleteRecordStatus: DeleteRecordStatus.success,
+                recordIdToBeDeleted: action.payload
             }
         default:
             return state;

@@ -30,6 +30,16 @@ const api = {
                 "Content-Type": "application/json"
             }
         })
+    ),
+    deleteDeleteRecord: (record_id: IRecord["record_id"]): Promise<AxiosResponse<ISuccess | IError>> => (
+        axios.delete<ISuccess | IError>("/", {
+            data: {
+                record_id
+            },
+            headers: {
+                "Content-Type": "application/json"
+            },
+        })
     )
 }
 

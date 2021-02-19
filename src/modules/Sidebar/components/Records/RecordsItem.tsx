@@ -1,14 +1,32 @@
 import React from "react";
 
+import { Preloader } from "..";
 import { IRecord } from "../redux/const";
 
 interface IProps {
     record: IRecord;
     weatherImg: string;
     optionsImg: string;
-    documentClickHandler: (ref: React.RefObject<HTMLDivElement>) => void;
-    triggerClickHandler: (ref: React.RefObject<HTMLDivElement>, e: React.MouseEvent<HTMLElement>) => void;
+    showPreloader?: boolean;
+    documentClickHandler: (
+        optionsRef: React.RefObject<HTMLDivElement>,
+        confirmationRef: React.RefObject<HTMLDivElement>,
+    ) => void;
+    deleteOptionClickHandler: (
+        confirmationRef: React.RefObject<HTMLDivElement>,
+        e: React.MouseEvent<HTMLElement>
+    ) => void;
+    deleteCancelClickHandler: (
+        confirmationRef: React.RefObject<HTMLDivElement>,
+        e: React.MouseEvent<HTMLElement>
+    ) => void;
+    triggerClickHandler: (
+        optionsRef: React.RefObject<HTMLDivElement>,
+        confirmationRef: React.RefObject<HTMLDivElement>,
+        e: React.MouseEvent<HTMLElement>
+    ) => void;
     editOptionClickHandler: (record: IRecord) => void;
+    deleteConfirmClickHandler: (record_id: IRecord["record_id"]) => void;
 }
 
 const RecordPropertyInfo: React.FC<{ label: string, value: string, unit?: string }> = ({ label, value, unit = "" }) => {
@@ -24,14 +42,19 @@ export const Record: React.FC<IProps> = ({
     record,
     weatherImg,
     optionsImg,
+    showPreloader = false,
     documentClickHandler,
     triggerClickHandler,
-    editOptionClickHandler }) => {
-    const controllersRef = React.useRef<HTMLDivElement>(null);
+    editOptionClickHandler,
+    deleteOptionClickHandler,
+    deleteCancelClickHandler,
+    deleteConfirmClickHandler }) => {
+    const optionsRef = React.useRef<HTMLDivElement>(null);
+    const confirmationRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
-        if (!controllersRef.current) return;
-        const bindedHandler = documentClickHandler.bind(null, controllersRef);
+        if (!optionsRef.current) return;
+        const bindedHandler = documentClickHandler.bind(null, optionsRef, confirmationRef);
         document.addEventListener("click", bindedHandler);
 
         return () => {
@@ -39,18 +62,17 @@ export const Record: React.FC<IProps> = ({
         }
     }, [documentClickHandler]);
 
+
     let recordDate = record.date.split(" ");
 
     return (
         <div className="col-12 col-sm-6 col-md-6 col-lg-4 mb-5" >
             <div className="record">
                 <div className="record__inner">
-                    <div className="delete-confirmation">
-                        <button className="cancel-delete">Cancel</button>
-                        <form className="delete-form" action="#">
-                            <input autoComplete="off" type="hidden" name="record" value={record.record_id} />
-                            <button className="confirm-delete">Delete</button>
-                        </form>
+                    <div ref={confirmationRef} onClick={deleteOptionClickHandler.bind(null, confirmationRef)} className="delete-confirmation">
+                        <button onClick={deleteCancelClickHandler.bind(null, confirmationRef)} className="cancel-delete">Cancel</button>
+                        <button onClick={deleteConfirmClickHandler.bind(null, record.record_id)} className="confirm-delete">Delete</button>
+                        {showPreloader && <Preloader />}
                     </div>
                     <div className="record__inner-content" >
                         <div className="record__image">
@@ -68,12 +90,12 @@ export const Record: React.FC<IProps> = ({
                             <p className="record__time">{recordDate[1].slice(0, -3)}</p>
                         </div>
                         <div className="record__options">
-                            <div onClick={triggerClickHandler.bind(null, controllersRef)} className="record__options-trigger">
+                            <div onClick={triggerClickHandler.bind(null, optionsRef, confirmationRef)} className="record__options-trigger">
                                 <img draggable="false" src={optionsImg} alt="options" />
                             </div>
-                            <div onClick={triggerClickHandler.bind(null, controllersRef)} ref={controllersRef} className="record__controllers">
+                            <div onClick={triggerClickHandler.bind(null, optionsRef, confirmationRef)} ref={optionsRef} className="record__controllers">
                                 <button onClick={editOptionClickHandler.bind(null, record)} className='record__controller record__controller_edit'>Edit</button>
-                                <button className='record__controller record__controller_delete'>Delete</button>
+                                <button onClick={deleteOptionClickHandler.bind(null, confirmationRef)} className='record__controller record__controller_delete'>Delete</button>
                             </div>
                         </div>
                     </div>
@@ -105,3 +127,4 @@ export const Record: React.FC<IProps> = ({
         </div>
     )
 }
+

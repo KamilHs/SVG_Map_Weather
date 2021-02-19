@@ -4,15 +4,29 @@ export const SET_FETCH_STATUS = "SET_FETCH_STATUS";
 export const SET_RECORDS = "SET_RECORDS";
 export const SET_EDITED_RECORD = "SET_EDITED_RECORD";
 export const SET_FORM_STATE = "SET_FORM_STATE";
-export const DELETE_RECORD = "DELETE_RECORD";
 export const SET_VALIDATION_ERRORS = "SET_VALIDATION_ERRORS";
 export const SET_FORM_SUBMISSION_STATUS = "SET_FORM_SUBMISSION_STATUS";
+export const SET_DELETE_RECORD_STATUS = "SET_DELETE_RECORD_STATUS";
+export const SET_RECORD_ID_TO_BE_DELETED = "SET_RECORD_ID_TO_BE_DELETED";
 
 export enum FetchStatus {
     loading,
     success,
     failure,
     none
+}
+
+export enum DeleteRecordStatus {
+    loading,
+    failure,
+    success,
+    none
+}
+
+export enum FormSubmissionStatus {
+    none,
+    success,
+    failure
 }
 
 export enum FormState {
@@ -100,7 +114,17 @@ interface ISetFormErrors {
 
 interface ISetFormSubmissionStatus {
     type: typeof SET_FORM_SUBMISSION_STATUS;
-    payload: boolean | null;
+    payload: FormSubmissionStatus;
+}
+
+interface ISetDeleteRecordStatus {
+    type: typeof SET_DELETE_RECORD_STATUS;
+    payload: DeleteRecordStatus;
+}
+
+interface ISetRecordToBeDeleted {
+    type: typeof SET_RECORD_ID_TO_BE_DELETED;
+    payload: IRecord["record_id"] | null;
 }
 
 export interface ICreateFormData {
@@ -118,13 +142,9 @@ export interface IEditFormData extends ICreateFormData {
     record_id: string;
 }
 
-export interface IDeleteRecord {
-    type: typeof DELETE_RECORD;
-    payload: IRecord["record_id"]
-}
-
 export type SidebarActionTypes = ISetSidebarIsClosing | ISetDescriptions | ISetFetchStatus |
-    ISetRecords | ISetEditedRecord | ISetFormState | ISetFormErrors | ISetFormSubmissionStatus;
+    ISetRecords | ISetEditedRecord | ISetFormState | ISetFormErrors | ISetFormSubmissionStatus |
+    ISetDeleteRecordStatus | ISetRecordToBeDeleted;
 
 export interface ISidebarState {
     records: IRecord[] | null;
@@ -132,7 +152,9 @@ export interface ISidebarState {
     isSidebarClosing: boolean;
     validationErrors: IValidationError;
     fetchStatus: FetchStatus;
-    formSubmissionStatus: boolean | null;
+    deleteRecordStatus: DeleteRecordStatus;
+    recordIdToBeDeleted: IRecord["record_id"] | null;
+    formSubmissionStatus: FormSubmissionStatus;
     descriptions: IFetchDescriptionsResult | null;
     formState: FormState;
 }
