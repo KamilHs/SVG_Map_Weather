@@ -3,7 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 
 import { RootState } from "../../store";
 import { mapActions } from "../Content/components/Map/redux/actions";
-import { Header, Preloader, Records, Form } from "./components";
+import { Header, Preloader, Records, Form, Statistics } from "./components";
 import { sidebarActions } from "./components/redux/actions";
 import { FetchStatus } from "./components/redux/const";
 import "./index.css"
@@ -23,10 +23,36 @@ const connector = connect(mapStateToProps, mapDispatch);
 type PropsRedux = ConnectedProps<typeof connector>
 type Props = PropsRedux;
 
+interface ISlideData {
+    startX: number;
+    startY: number;
+    endX: number;
+    endY: number;
+    totalDx: number;
+    prevDx: number;
+    prevTransform: number;
+    activePage: ActivePage;
+}
+
+enum ActivePage {
+    records,
+    stats,
+}
 
 const Sidebar: React.FC<Props> = ({ records, selectedRegion, isAnimating, fetchStatus, setRecords, fetchRecordsByIso, setSelectedRegion, setIsSidebarClosing }) => {
     const [opened, setOpened] = React.useState<boolean>(false);
     const contentRef = React.useRef<HTMLDivElement>(null);
+    const pagesRef = React.useRef<HTMLDivElement>(null);
+    const slideDataRef = React.useRef<ISlideData>({
+        startX: 0,
+        startY: 0,
+        endX: 0,
+        endY: 0,
+        totalDx: 0,
+        prevDx: 0,
+        prevTransform: 0,
+        activePage: ActivePage.records,
+    });
 
     const openedTransitionEndHandler = React.useCallback(() => {
         setOpened(true);
@@ -52,6 +78,65 @@ const Sidebar: React.FC<Props> = ({ records, selectedRegion, isAnimating, fetchS
             contentRef.current.addEventListener("transitionend", closedTransitionEndHandler)
         }
     }, [closedTransitionEndHandler, setIsSidebarClosing]);
+
+    const slideToActivePage = React.useCallback(() => {
+        if (!pagesRef.current) return;
+        let { activePage } = slideDataRef.current;
+        pagesRef.current.style.transform = `translateX(calc(-${50 * activePage}% - ${activePage * 0.8}rem))`;
+    }, []);
+
+    const handlePageSwipe = React.useCallback(() => {
+        if (!pagesRef.current) return;
+
+        let { activePage } = slideDataRef.current;
+        slideDataRef.current.activePage = activePage === ActivePage.records
+            ? ActivePage.stats
+            : ActivePage.records;
+        slideToActivePage();
+    }, [slideToActivePage])
+
+    const handleTouchStart = React.useCallback((e: TouchEvent) => {
+        if (!pagesRef.current) return;
+        if (pagesRef.current.style.transform) {
+            let style: CSSStyleDeclaration = window.getComputedStyle(pagesRef.current);
+            let matrix = new WebKitCSSMatrix(style.transform);
+            slideDataRef.current.prevTransform = matrix.m41;
+        }
+        slideDataRef.current.startX = e.touches[0].clientX;
+        slideDataRef.current.startY = e.touches[0].clientY;
+    }, []);
+    const handleTouchMove = React.useCallback((e: TouchEvent) => {
+        if (!pagesRef.current) return;
+        slideDataRef.current.endX = e.touches[0].clientX;
+        slideDataRef.current.endY = e.touches[0].clientY;
+
+        let dx = slideDataRef.current.endX - slideDataRef.current.startX;
+        let dy = slideDataRef.current.endY - slideDataRef.current.startY;
+        let { activePage } = slideDataRef.current;
+
+        if (dx > 0 && activePage === ActivePage.records) return;
+        if (dx < 0 && activePage === ActivePage.stats) return;
+        if (Math.abs(dy) > Math.abs(dx)) return;
+
+        let sign = dx >= 0 ? 1 : -1;
+
+        slideDataRef.current.totalDx += Math.abs(slideDataRef.current.prevDx - dx) * sign;
+        if (Math.abs(slideDataRef.current.totalDx) >= pagesRef.current.clientWidth / 5) {
+            slideDataRef.current.totalDx = 0;
+            slideDataRef.current.prevDx = 0;
+            handlePageSwipe();
+            return;
+        }
+        pagesRef.current.style.transform = `translateX(${slideDataRef.current.prevTransform + slideDataRef.current.totalDx}px)`;
+        slideDataRef.current.prevDx = dx;
+    }, [handlePageSwipe]);
+    const handleTouchEnd = React.useCallback((e: TouchEvent) => {
+        if (!pagesRef.current) return;
+
+        slideDataRef.current.totalDx = 0;
+        slideDataRef.current.prevDx = 0;
+        slideToActivePage();
+    }, [slideToActivePage]);
 
     React.useEffect(() => {
         const div = contentRef.current;
@@ -86,6 +171,19 @@ const Sidebar: React.FC<Props> = ({ records, selectedRegion, isAnimating, fetchS
         window.addEventListener("resize", resizeAndLoadHandler);
     });
 
+    React.useEffect(() => {
+        let div = pagesRef.current;
+        if (!div) return;
+        div.addEventListener("touchstart", handleTouchStart);
+        div.addEventListener("touchmove", handleTouchMove);
+        div.addEventListener("touchend", handleTouchEnd);
+        return () => {
+            if (!div) return;
+            div.removeEventListener("touchstart", handleTouchStart);
+            div.removeEventListener("touchmove", handleTouchMove);
+            div.removeEventListener("touchend", handleTouchEnd);
+        }
+    })
 
     React.useEffect(() => {
         if (selectedRegion && !isAnimating) {
@@ -106,8 +204,13 @@ const Sidebar: React.FC<Props> = ({ records, selectedRegion, isAnimating, fetchS
                 {
                     records && opened && <>
                         <div className="inner_content">
-                            <div className="pages">
+                            <div ref={pagesRef} className="pages">
                                 <Records />
+                                <Statistics />
+                            </div>
+                            <div className="page-controllers">
+                                <button className="page-controller page-controller_left page-controller_active"></button>
+                                <button className="page-controller page-controller_right"></button>
                             </div>
                         </div>
                         <Form />

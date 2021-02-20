@@ -1,0 +1,47 @@
+canvas {
+    background-color: #fff;
+    border-radius: 5px;
+}
+
+.stats {
+    margin-top: 0.8rem;
+    height: 90vh;
+    position: relative;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+}
+
+.stats::-webkit-scrollbar {
+    width: 6px;
+    border-radius: 16px;
+}
+
+.stats::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 16px;
+}
+
+.stats::-webkit-scrollbar-thumb {
+    cursor: pointer;
+    background: rgb(79, 61, 125);
+    border-radius: 16px;
+    cursor: pointer;
+}
+
+.stats::-webkit-scrollbar-thumb:hover {
+    background: rgb(80, 146, 245);
+}
+
+.chart {
+    margin-bottom: 2rem;
+}
+
+.data-info {
+    padding: 10px;
+}
+
+.data-info__item {
+    color: white;
+    margin: 0.5rem;
+    font-size: 1rem;
+}
