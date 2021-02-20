@@ -31,18 +31,22 @@ interface ISlideData {
     totalDx: number;
     prevDx: number;
     prevTransform: number;
-    activePage: ActivePage;
+    activePage: Page;
 }
 
-enum ActivePage {
+enum Page {
     records,
     stats,
 }
+
+let isFirstTime = true;
 
 const Sidebar: React.FC<Props> = ({ records, selectedRegion, isAnimating, fetchStatus, setRecords, fetchRecordsByIso, setSelectedRegion, setIsSidebarClosing }) => {
     const [opened, setOpened] = React.useState<boolean>(false);
     const contentRef = React.useRef<HTMLDivElement>(null);
     const pagesRef = React.useRef<HTMLDivElement>(null);
+    const slideTutorialRef = React.useRef<HTMLDivElement>(null);
+    const pageControllersRef = React.useRef<HTMLDivElement>(null);
     const slideDataRef = React.useRef<ISlideData>({
         startX: 0,
         startY: 0,
@@ -51,8 +55,18 @@ const Sidebar: React.FC<Props> = ({ records, selectedRegion, isAnimating, fetchS
         totalDx: 0,
         prevDx: 0,
         prevTransform: 0,
-        activePage: ActivePage.records,
+        activePage: Page.records,
     });
+
+    const removeTutorial = React.useCallback(() => {
+        isFirstTime = false;
+        if (pageControllersRef.current) {
+            pageControllersRef.current.querySelectorAll(".page-controller")[1].classList.remove("flicker");
+        }
+        if (slideTutorialRef.current) {
+            slideTutorialRef.current.classList.add("d-none");
+        }
+    }, []);
 
     const openedTransitionEndHandler = React.useCallback(() => {
         setOpened(true);
@@ -79,24 +93,30 @@ const Sidebar: React.FC<Props> = ({ records, selectedRegion, isAnimating, fetchS
         }
     }, [closedTransitionEndHandler, setIsSidebarClosing]);
 
-    const slideToActivePage = React.useCallback(() => {
+    const slideToPage = React.useCallback(() => {
         if (!pagesRef.current) return;
         let { activePage } = slideDataRef.current;
         pagesRef.current.style.transform = `translateX(calc(-${50 * activePage}% - ${activePage * 0.8}rem))`;
     }, []);
 
     const handlePageSwipe = React.useCallback(() => {
-        if (!pagesRef.current) return;
+        if (!pagesRef.current || !pageControllersRef.current) return;
 
         let { activePage } = slideDataRef.current;
-        slideDataRef.current.activePage = activePage === ActivePage.records
-            ? ActivePage.stats
-            : ActivePage.records;
-        slideToActivePage();
-    }, [slideToActivePage])
+
+        slideDataRef.current.activePage = activePage === Page.records
+            ? Page.stats
+            : Page.records;
+
+        pageControllersRef.current.querySelectorAll(".page-controller").forEach(controller => (
+            controller.classList.toggle("page-controller_active")
+        ))
+        slideToPage();
+    }, [slideToPage]);
 
     const handleTouchStart = React.useCallback((e: TouchEvent) => {
         if (!pagesRef.current) return;
+        removeTutorial();
         if (pagesRef.current.style.transform) {
             let style: CSSStyleDeclaration = window.getComputedStyle(pagesRef.current);
             let matrix = new WebKitCSSMatrix(style.transform);
@@ -104,7 +124,7 @@ const Sidebar: React.FC<Props> = ({ records, selectedRegion, isAnimating, fetchS
         }
         slideDataRef.current.startX = e.touches[0].clientX;
         slideDataRef.current.startY = e.touches[0].clientY;
-    }, []);
+    }, [removeTutorial]);
     const handleTouchMove = React.useCallback((e: TouchEvent) => {
         if (!pagesRef.current) return;
         slideDataRef.current.endX = e.touches[0].clientX;
@@ -114,8 +134,8 @@ const Sidebar: React.FC<Props> = ({ records, selectedRegion, isAnimating, fetchS
         let dy = slideDataRef.current.endY - slideDataRef.current.startY;
         let { activePage } = slideDataRef.current;
 
-        if (dx > 0 && activePage === ActivePage.records) return;
-        if (dx < 0 && activePage === ActivePage.stats) return;
+        if (dx > 0 && activePage === Page.records) return;
+        if (dx < 0 && activePage === Page.stats) return;
         if (Math.abs(dy) > Math.abs(dx)) return;
 
         let sign = dx >= 0 ? 1 : -1;
@@ -135,8 +155,14 @@ const Sidebar: React.FC<Props> = ({ records, selectedRegion, isAnimating, fetchS
 
         slideDataRef.current.totalDx = 0;
         slideDataRef.current.prevDx = 0;
-        slideToActivePage();
-    }, [slideToActivePage]);
+        slideToPage();
+    }, [slideToPage]);
+
+    const handlePageControllerClick = React.useCallback((activePage: Page) => {
+        if (activePage === slideDataRef.current.activePage) return;
+        removeTutorial();
+        handlePageSwipe();
+    }, [handlePageSwipe, removeTutorial]);
 
     React.useEffect(() => {
         const div = contentRef.current;
@@ -159,11 +185,17 @@ const Sidebar: React.FC<Props> = ({ records, selectedRegion, isAnimating, fetchS
             && !contentRef.current.classList.contains("content_mobile")) {
             contentRef.current.classList.add("content_mobile");
             contentRef.current.classList.remove("content_desktop");
+            if (isFirstTime && slideTutorialRef.current) {
+                slideTutorialRef.current.classList.remove("d-none");
+            }
         }
         else if (elem.clientWidth > elem.clientHeight
             && !contentRef.current.classList.contains("content_desktop")) {
             contentRef.current.classList.add("content_desktop");
             contentRef.current.classList.remove("content_mobile");
+            if (isFirstTime && slideTutorialRef.current) {
+                slideTutorialRef.current.classList.add("d-none");
+            }
         }
     }, [])
 
@@ -202,20 +234,28 @@ const Sidebar: React.FC<Props> = ({ records, selectedRegion, isAnimating, fetchS
                     handleClose={handleClose}
                 />
                 {
-                    records && opened && <>
+                    records && records.length !== 0 && opened && <>
                         <div className="inner_content">
                             <div ref={pagesRef} className="pages">
                                 <Records />
-                                <Statistics />
+                                <Statistics records={records} />
                             </div>
-                            <div className="page-controllers">
-                                <button className="page-controller page-controller_left page-controller_active"></button>
-                                <button className="page-controller page-controller_right"></button>
+                            <div ref={pageControllersRef} className="page-controllers">
+                                <button onClick={handlePageControllerClick.bind(null, Page.records)} className="page-controller page-controller_left page-controller_active"></button>
+                                <button onClick={handlePageControllerClick.bind(null, Page.stats)} className={`page-controller page-controller_right ${isFirstTime && "flicker"}`}></button>
+                            </div>
+                            <div ref={slideTutorialRef} className="slide-tutorial">
+                                <span className="slide-tutorial__content"></span>
                             </div>
                         </div>
                         <Form />
                     </>
                 }
+                {records && records.length === 0 && (
+                    <div className="d-flex justify-content-center align-items-center w-100 h-100 error text-center" >
+                        <h2 className="text-center w-100">No Data</h2>
+                    </div >
+                )}
                 {fetchStatus === FetchStatus.loading && opened && <Preloader overlay />}
                 {fetchStatus === FetchStatus.failure && opened && (
                     <div className="d-flex justify-content-center align-items-center w-100 h-100 error text-center" >
