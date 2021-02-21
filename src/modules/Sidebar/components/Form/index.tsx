@@ -231,7 +231,7 @@ const Form: React.FC<Props> = ({
                                 <span className="form__error" id="temp_desc-error">{validationErrors.temp_desc_id}</span>
                             </div>
                             <select
-                                defaultValue={values.temp_desc_id}
+                                value={values.temp_desc_id}
                                 onChange={e => setValues({ ...values, temp_desc_id: e.target.value })}
                                 name="temp_desc_id"
                                 id="temp_desc_id"
@@ -250,7 +250,7 @@ const Form: React.FC<Props> = ({
                                 <span className="form__error" id="weather_desc-error">{validationErrors.weather_desc_id}</span>
                             </div>
                             <select
-                                defaultValue={values.weather_desc_id}
+                                value={values.weather_desc_id}
                                 onChange={e => setValues({ ...values, weather_desc_id: e.target.value })}
                                 name="weather_desc_id"
                                 id="weather_desc_id"
