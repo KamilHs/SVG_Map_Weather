@@ -89,13 +89,19 @@ const Statistics: React.FC<IProps> = ({ records }) => {
         to: records[0].date
     })
     const [filter, setFilter] = React.useState<FilterType>(FilterType.daily);
-    const data: ChartData[] = React.useMemo(() => {
+
+    const recordsInInterval: IRecord[] = React.useMemo(() => {
         let start = +new Date(getDay(intervalDates.from));
         let end = +new Date(getDay(intervalDates.to));
-        let filtered = groupBy(records.filter(record => {
+
+        return records.filter(record => {
             let date = + new Date(getDay(record.date));
             return date >= start && date <= end
-        }).reverse(), filter);
+        })
+    }, [intervalDates, records]);
+
+    const data: ChartData[] = React.useMemo(() => {
+        let filtered = groupBy(recordsInInterval.reverse(), filter);
 
         const entries = Object.entries(filtered);
         const bgColors = new Array(entries.length).fill("rgb(255,0,0)");
@@ -113,7 +119,33 @@ const Statistics: React.FC<IProps> = ({ records }) => {
             }],
         } as ChartData
         ))
-    }, [records, filter, intervalDates])
+    }, [filter, recordsInInterval]);
+    const extremeValues = React.useMemo(() => {
+        let result = {
+            minTemperature: Number.MAX_VALUE,
+            maxTemperature: Number.MIN_VALUE,
+            minPressure: Number.MAX_VALUE,
+            maxPressure: Number.MIN_VALUE,
+            minWindSpeed: Number.MAX_VALUE,
+            maxWindSpeed: Number.MIN_VALUE,
+            minHumidity: Number.MAX_VALUE,
+            maxHumidity: Number.MIN_VALUE,
+        }
+
+        type resultType = typeof result;
+
+        return recordsInInterval.reduce<resultType>((acc: resultType, record) => ({
+            minTemperature: Math.min(acc.minTemperature, +record.temperature),
+            maxTemperature: Math.max(acc.maxTemperature, +record.temperature),
+            minPressure: Math.min(acc.minPressure, +record.pressure),
+            maxPressure: Math.max(acc.maxPressure, +record.pressure),
+            minWindSpeed: Math.min(acc.minWindSpeed, +record.wind_speed),
+            maxWindSpeed: Math.max(acc.maxWindSpeed, +record.wind_speed),
+            minHumidity: Math.min(acc.minHumidity, +record.humidity),
+            maxHumidity: Math.max(acc.maxHumidity, +record.humidity),
+        }), { ...result })
+    }, [recordsInInterval]);
+
     return (
         <div className="stats">
             <div className="container-fluid h-100">
@@ -152,20 +184,45 @@ const Statistics: React.FC<IProps> = ({ records }) => {
                             <p className="data-info__item number_of_records"></p>
                             <div className="d-flex justify-content-between h-100 flex-wrap">
                                 <div>
-                                    <p className="data-info__item max-temperature"></p>
-                                    <p className="data-info__item min-temperature"></p>
+                                    <p className="data-info__item max-temperature">Max Temperature: {
+                                        recordsInInterval.length
+                                            ? + extremeValues.maxTemperature + " °C"
+                                            : "No data"
+                                    }</p>
+                                    <p className="data-info__item min-temperature">Min Temperature: {
+                                        recordsInInterval.length
+                                            ? + extremeValues.minTemperature + " °C"
+                                            : "No data"}</p>
                                 </div>
                                 <div>
-                                    <p className="data-info__item max-wind_speed"></p>
-                                    <p className="data-info__item min-wind_speed"></p>
+                                    <p className="data-info__item max-wind_speed">Max Wind Speed: {
+                                        recordsInInterval.length
+                                            ? extremeValues.maxWindSpeed + " km/h"
+                                            : "No data"}</p>
+                                    <p className="data-info__item min-wind_speed">Min Wind Speed: {
+                                        recordsInInterval.length
+                                            ? extremeValues.minWindSpeed + " km/h"
+                                            : "No data"}</p>
                                 </div>
                                 <div>
-                                    <p className="data-info__item max-pressure"></p>
-                                    <p className="data-info__item min-pressure"></p>
+                                    <p className="data-info__item max-pressure">Max Pressure: {
+                                        recordsInInterval.length
+                                            ? extremeValues.maxPressure + " mb"
+                                            : "No data"}</p>
+                                    <p className="data-info__item min-pressure">Min Pressure: {
+                                        recordsInInterval.length
+                                            ? extremeValues.maxPressure + " mb"
+                                            : "No data"}</p>
                                 </div>
                                 <div>
-                                    <p className="data-info__item max-humidity"></p>
-                                    <p className="data-info__item min-humidity"></p>
+                                    <p className="data-info__item max-humidity">Max Humidity: {
+                                        recordsInInterval.length
+                                            ? extremeValues.maxHumidity + " %"
+                                            : "No data"}</p>
+                                    <p className="data-info__item min-humidity">Min Humidity: {
+                                        recordsInInterval.length
+                                            ? extremeValues.maxHumidity + " %"
+                                            : "No data"}</p>
                                 </div>
                             </div>
                         </div>
