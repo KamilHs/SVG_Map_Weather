@@ -180,19 +180,19 @@ const Sidebar: React.FC<Props> = ({ records, selectedRegion, isAnimating, fetchS
 
     const resizeAndLoadHandler = React.useCallback(() => {
         if (!contentRef.current) return;
+
         let elem = document.documentElement;
-        if (elem.clientWidth < elem.clientHeight
-            && !contentRef.current.classList.contains("content_mobile")) {
+        if (elem.clientWidth < elem.clientHeight) {
             contentRef.current.classList.add("content_mobile");
             contentRef.current.classList.remove("content_desktop");
             if (isFirstTime && slideTutorialRef.current) {
                 slideTutorialRef.current.classList.remove("d-none");
             }
         }
-        else if (elem.clientWidth > elem.clientHeight
-            && !contentRef.current.classList.contains("content_desktop")) {
+        else if (elem.clientWidth > elem.clientHeight) {
             contentRef.current.classList.add("content_desktop");
             contentRef.current.classList.remove("content_mobile");
+
             if (isFirstTime && slideTutorialRef.current) {
                 slideTutorialRef.current.classList.add("d-none");
             }
@@ -244,7 +244,7 @@ const Sidebar: React.FC<Props> = ({ records, selectedRegion, isAnimating, fetchS
                                 <button onClick={handlePageControllerClick.bind(null, Page.records)} className="page-controller page-controller_left page-controller_active"></button>
                                 <button onClick={handlePageControllerClick.bind(null, Page.stats)} className={`page-controller page-controller_right ${isFirstTime && "flicker"}`}></button>
                             </div>
-                            <div ref={slideTutorialRef} className="slide-tutorial">
+                            <div ref={slideTutorialRef} className={`slide-tutorial ${document.documentElement.clientWidth >= document.documentElement.clientHeight && "d-none"}`}>
                                 <span className="slide-tutorial__content"></span>
                             </div>
                         </div>
