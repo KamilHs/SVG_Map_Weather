@@ -244,9 +244,12 @@ const Sidebar: React.FC<Props> = ({ records, selectedRegion, isAnimating, fetchS
                                 <button onClick={handlePageControllerClick.bind(null, Page.records)} className="page-controller page-controller_left page-controller_active"></button>
                                 <button onClick={handlePageControllerClick.bind(null, Page.stats)} className={`page-controller page-controller_right ${isFirstTime && "flicker"}`}></button>
                             </div>
-                            <div ref={slideTutorialRef} className={`slide-tutorial ${document.documentElement.clientWidth >= document.documentElement.clientHeight && "d-none"}`}>
-                                <span className="slide-tutorial__content"></span>
-                            </div>
+                            {
+                                isFirstTime &&
+                                <div ref={slideTutorialRef} className={`slide-tutorial ${document.documentElement.clientWidth >= document.documentElement.clientHeight && "d-none"}`}>
+                                    <span className="slide-tutorial__content"></span>
+                                </div>
+                            }
                         </div>
                         <Form />
                     </>
